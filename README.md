@@ -1,2 +1,2 @@
 # Boilerplate
-PHP7 Framework for creating web application's
+PHP7 Framework for writing web application's
