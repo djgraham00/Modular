@@ -1,0 +1,7 @@
+{
+    "ImportFileName" : "autoload.php",
+    "MainClass"      : "coreauth",
+    "RouteDefinitionVar"  : "rts",
+    "HasRouteDefinitions" : true
+
+}
