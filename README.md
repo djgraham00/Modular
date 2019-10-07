@@ -1,5 +1,5 @@
 # Boilerplate
-Lightweight framework for PHP WebApps.
+Lightweight PHP framework for WebApps
 
 ### IMPORTANT
 Boilerplate is currently early in develeopment and is therefore not suitable for use in projects. If you would like to create an app using this version of Boilerplate, compatiblity with future relases is not garuenteed. 
