@@ -1,10 +1,16 @@
 <?php
+require ("src/BoilerPlate.php");
+
+$bp = new Boilerplate();
+
+$bp->render($_POST, $_GET);
+
 
 //$eng = new RoutingEngine();
 
 //$eng->defineRoute("/test/", "test");
 
-$Routes = array(
+/* $Routes = array(
     "/admin" => array(
         "path" => "/admin",
         "accessTo" => array("1"),
@@ -46,63 +52,7 @@ $Routes = array(
 
 
 
-if(isset($_GET['rt'])){
-    $route = $_GET['rt'];
-}
-else{
-    $route = "/";
-}
 
-$rt = explode("/",$route);
-$rt = array_filter($rt);
-
-if(isRouteDynamic($rt[1])){
-    $thisRoute = $Routes["/".$rt[1]];
-
-    if(count($rt) > 1) {
-
-        /* Filter through the URL request and put the variable values into an array*/
-        $vars = array();
-
-        for ($i = 1; $i < count($rt); $i++) {
-           array_push($vars, $rt[$i+1]);
-        }
-
-        /* Filter through the route path to find the variable names, and put them in an array */
-        $varNames = explode("/", $thisRoute["path"]);
-        $varNames = array_filter($varNames);
-        unset($varNames[1]);
-        $varNames = array_values($varNames);
-
-        /* Assign each match up the variable namess and values and create the variables */
-        for ($i = 0; $i < count($varNames); $i++){
-            $varName = preg_replace('/(.*?)\/{(.*?)}/', '$2', $varNames[$i]);
-            @${$varName} = $vars[$i];
-            echo ${$varName};
-            echo "<HR/>";
-        }
-
-    }
-}
-
-
-function isRouteDynamic($rt){
-    global $Routes;
-
-    if (isset($Routes["/$rt"])){
-        $thisRt = $Routes["/$rt"];
-        if(strstr ($thisRt["path"], "{")){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    else{
-        return false;
-    }
-
-}
 
 
 

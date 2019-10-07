@@ -5,183 +5,114 @@
  *
  */
 
-class BoilerPlate {
+class Boilerplate {
 
-    public $conn;
-    public $salesTax;
-    public $displayName;
-
-    private $SQL_CONN = array(
-        "localhost",
-        "root",
-        "",
-        "swzd_GAMETIME"
-    );
-
-
-    /*
-        Define routes
-    */
-    public $Routes = array(
-        "/admin" => array(
-            "path" => "/admin",
-            "accessTo" => array("1"),
-            "template" => "admin/index.tpl.php"
-        ),
-
-        "/login" => array(
-            "path" => "/login",
-            "accessTo" => NULL,
-            "template" => "login/index.tpl.php"
-        ),
-
-        "/home" => array(
-            "path" => "/home",
-            "accessTo" => array("1"),
-            "template" => "home/index.tpl.php"
-        ),
-        "/inv" => array(
-            "path" => "/inv",
-            "accessTo" => array("1"),
-            "template" => "admin/inv.tpl.php"
-        ),
-        "/register" => array(
-            "path" => "/register",
-            "accessTo" => array("1"),
-            "template" => "home/register.tpl.php"
-        ),
-        "/finalizeTransaction" => array(
-            "path" => "/finalizeTransaction",
-            "accessTo" => array("1"),
-            "template" => "home/finalize.tpl.php"
-        )
-    );
+    private $dbtype = "mysql";
+    private $dbhost = "localhost";
+    private $APP_DB_NAME = "bpdev";
+    private $dbuser = "root";
+    private $dbpass = "";
+    public $PDO;
+    public $Modules;
+    public $loadedModNames = array();
+    public $AppName = "Boilerplate Dev";
+    public $Routes = array();
+    public $BASE_URL = "http://localhost/boilerplate/";
 
 
-    public function __construct() {
-        $this->conn = new mysqli($this->SQL_CONN[0],$this->SQL_CONN[1], $this->SQL_CONN[2],$this->SQL_CONN[3]);
-        $this->salesTax = $this->config("salesTax");
-        $this->displayName = $this->config("displayName");
-    }
-
-    /*
-        Authentication
-    */
-    public function auth($username, $password){
-
-        if(password_verify($password, $this->getPassword($username))){
-            $this->createSession($this->getUser($username)["id"]);
-            return true;
-        }
-        else{
-            return false;
-        }
+    public function __construct()
+    {
+        $this->PDO = new PDO($this->dbtype . ":host=" . $this->dbhost . ";dbname=" . $this->APP_DB_NAME, $this->dbuser, $this->dbpass);
+        $this->loadModules();
 
     }
 
-    public function deAuth(){
-        $sessID = $_COOKIE['session'];
+    public function loadModules() {
 
-        setcookie( "session", "NULL", strtotime( '+30 days' ), '/');
+        $modules = array_diff(scandir(__DIR__ . "\\modules"), array('.', '..'));
 
-        if($this->destroySession($sessID)){
-            return true;
+        $routes = array();
+
+        foreach ($modules as $mod) {
+
+            if (file_exists(__DIR__ . "/modules/$mod/$mod.json")) {
+                $moduleInfo = json_decode(file_get_contents(__DIR__ ."/modules/$mod/$mod.json"));
+
+                require(__DIR__ . "/modules/$mod/" . $moduleInfo->ImportFileName);
+                $mainClass = $moduleInfo->MainClass;
+
+                ${$mod} = new $mainClass();
+
+                if ($moduleInfo->HasRouteDefinitions) {
+                    $routeDefinitionVar = $moduleInfo->RouteDefinitionVar;
+                    $this->Routes = array_merge($this->Routes, ${$mod}->{$routeDefinitionVar});
+
+                }
+
+                array_push($modules, array("_$mainClass" => ${$mod}));
+                array_push($this->loadedModNames, $mod);
+            }
+        }
+
+     }
+
+    public function render($postVars, $getVars) {
+
+        $BoilerPlate = $this;
+
+        if (isset($getVars['rt'])) {
+            $route = $getVars['rt'];
+        } else {
+            $route = "/";
+        }
+
+        if($route != "/") {
+            $rt = explode("/", $route);
+            $rt = array_filter($rt);
+
+            $thisRoute = $this->Routes["/" . $rt[1]];
         }
         else{
-            return false;
+            $rt = array("", "/");
+            $thisRoute = $this->Routes["/"];
         }
+        if ($this->isRouteDynamic($rt[1])) {
+
+            if (count($rt) > 1) {
+
+                /* Filter through the URL request and put the variable values into an array*/
+                $vars = array();
+
+                for ($i = 1; $i < count($rt); $i++) {
+                    array_push($vars, $rt[$i + 1]);
+                }
+
+                /* Filter through the route path to find the variable names, and put them in an array */
+                $varNames = explode("/", $thisRoute["path"]);
+                $varNames = array_filter($varNames);
+                unset($varNames[1]);
+                $varNames = array_values($varNames);
+
+                /* Assign each match up the variable namess and values and create the variables */
+                for ($i = 0; $i < count($varNames); $i++) {
+                    $varName = preg_replace('/(.*?)\/{(.*?)}/', '$2', $varNames[$i]);
+                    @${$varName} = $vars[$i];
+                }
+
+            }
+        }
+        include($thisRoute["template"]);
     }
 
-    public function checkAuth(){
+    private function isRouteDynamic($rt){
 
-        if(!isset($_COOKIE['session'])){
-            return false;
-        }
-        else if(!$this->validateSession($_COOKIE['session'])){
-            return false;
-        }
-        else{
-            return true;
-        }
-
-    }
-
-    /*
-        Permissions and Access Control
-    */
-
-    public function checkRole($id){
-        $thisUserID = $this->getUser()["id"];
-        $sql = "SELECT role FROM accesscontrol WHERE userID='$thisUserID' AND role='$id'";
-
-        if($this->conn->query($sql)->num_rows > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    /*
-        Session Management
-    */
-
-    public function validateSession($id){
-
-        //SQL query that tests if a session id exists in the database
-        $sql = "SELECT sessionID FROM session WHERE sessionID='$id'";
-
-        if($this->conn->query($sql)->num_rows > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    public function destroySession($id){
-        $sql = "DELETE FROM session WHERE sessionID='$id'";
-
-        if($this->conn->query($sql) === TRUE){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    public function createSession($userID){
-
-        $sessID = md5(time()*rand(10, 10000));
-
-        $sql = "INSERT INTO session (userID, sessionID) VALUES ('$userID', '$sessID')";
-
-        $result = $this->conn->query($sql);
-
-        if( $result === TRUE){
-            setcookie( "session", $sessID, strtotime( '+30 days' ), '/');
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    public function getCurrentUserFromSessionID(){
-
-        if(isset($_COOKIE['session'])){
-            $sessID = $_COOKIE['session'];
-        }
-        else{
-            return false;
-        }
-
-        $sql = "SELECT userID FROM session WHERE sessionID='$sessID'";
-
-        $result = $this->conn->query($sql);
-
-        if($result->num_rows > 0){
-            while($row = $result->fetch_assoc()){
-                return $row['userID'];
+        if (isset($this->Routes["/$rt"])){
+            $thisRt = $this->Routes["/$rt"];
+            if(strstr ($thisRt["path"], "{")){
+                return true;
+            }
+            else{
+                return false;
             }
         }
         else{
@@ -189,10 +120,21 @@ class BoilerPlate {
         }
     }
 
+    public function hasMod($module){
+        if(in_array($module, $this->loadedModNames)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
-    public function render($postVars, $getVars){
+    /*
+     * OLD RENDER FUNCTION
+     *
+     * public function render($postVars, $getVars){
 
-        $ep = $this;
+        $BoilerPlate = $this;
 
         if(isset($getVars['rt'])){
             $route = $getVars['rt'];
@@ -243,7 +185,111 @@ class BoilerPlate {
             include("templates/errors/404.tpl.php");
         }
 
+    } */
+
+    /*
+     *
+     * Boilerplate Database Function
+     *
+     */
+
+
+    public function insertObject($obj){
+
+        if(tableExists($obj->tableName)) {
+            try {
+                $sql = "INSERT INTO ".$obj->tableName." (".$obj->generateInsertStr().") VALUES (".$obj->generateInsertVal().")";
+                $this->PDO->exec($sql);
+                return true;
+            } catch (PDOException $e) {
+                return false;
+            }
+        }
+        else{
+            $objName = get_class($obj);
+            createTable(new $objName());
+            insertObject($obj);
+        }
     }
 
+    public function getInstance($refObj, $key, $value){
+
+        try{
+            $sql = "SELECT * FROM ".$refObj->tableName. " WHERE $key='$value'";
+
+            $getObjs = $this->PDO->prepare($sql);
+            $getObjs->execute();
+
+            $objs = $getObjs->fetchAll();
+
+            foreach($objs[0] as $key=>$value){
+                $refObj->{$key} = $value;
+            }
+
+            return $refObj;
+
+        }
+        catch (PDOException $e){
+            echo $e->getMessage();
+        }
+    }
+
+    public function getAllObjects($refObj){
+
+        try{
+            $sql = "SELECT * FROM ".$refObj->tableName;
+            $getObjs = $this->PDO->prepare($sql);
+            $getObjs->execute();
+
+            $tmp = array();
+
+            $objs = $getObjs->fetchAll();
+
+            foreach($objs as $obj) {
+                $class = get_class($refObj);
+                $tmpObj = new $class();
+                foreach($obj as $key=>$value){
+                    $tmpObj->{$key} = $value;
+                }
+                array_push($tmp, $tmpObj);
+            }
+
+            return $tmp;
+
+        }
+        catch (PDOException $e){
+            echo $e->getMessage();
+        }
+
+    }
+
+    public function tableExists($table) {
+        // Try a select statement against the table
+        // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
+        try {
+            $result = $this->PDO->query("SELECT 1 FROM $table LIMIT 1");
+        } catch (Exception $e) {
+            // We got an exception == table not found
+            return FALSE;
+        }
+
+        // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
+        return $result !== FALSE;
+    }
+
+    public function createTable($obj){
+        // Try a select statement against the table
+        // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
+        try {
+            $result = $this->PDO->exec($obj->generateSQLModel());
+        } catch (Exception $e) {
+            // We got an exception == table not found
+
+            echo $e->getMessage();
+        }
+
+        // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
+        return $result !== FALSE;
+    }
 
 }
