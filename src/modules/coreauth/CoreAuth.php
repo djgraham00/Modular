@@ -14,8 +14,24 @@ class CoreAuth {
             "path" => "/login",
             "accessTo" => array("1"),
             "template" => "modules/coreauth/templates/index.tpl.php"
+        ),
+        "/_coreAuthAPI" => array(
+            "path" => "/_coreAuthAPI/auth",
+            "accessTo" => array("1"),
+            "template" => "modules/coreauth/templates/auth.api.php"
+        ),
+        "/coreAuthHome" => array(
+            "path" => "/coreAuthHome",
+            "accessTo" => array("1"),
+            "template" => "modules/coreauth/templates/builtin_home.tpl.php"
         )
     );
+
+    public $Parent;
+
+    public function __construct($p){
+        $this->Parent = $p;
+    }
 
     /*
         Account Management
@@ -43,16 +59,18 @@ class CoreAuth {
     public function getPassword($username)
     {
 
-        if($inst = Boilerplate::getInstance(new coreauth_USER(), "username", $username) === TRUE) {
-            return $inst;
-        }
-        else {
-            return false;
-        }
+       $obj = $this->Parent->getInstance(new coreauth_USER(), "username", $username);
+
+       if($obj){
+           return $obj->password;
+       }
+       else{
+           return false;
+       }
 
     }
 
-    public function getUsername($param)
+   /* public function getUsername($param)
     {
 
         $sql = "SELECT username FROM users WHERE username='$param' LIMIT 1";
@@ -66,9 +84,9 @@ class CoreAuth {
             return false;
         }
 
-    }
+    } */
 
-    public function getUserRoles($userID)
+    /* public function getUserRoles($userID)
     {
 
         $sql = "SELECT * FROM accesscontrol WHERE userID='$userID'";
@@ -85,19 +103,18 @@ class CoreAuth {
 
         return $tmp;
 
-    }
+    } */
 
     public function getUser($username)
     {
 
-        $sql = "SELECT * FROM users WHERE username='$username' LIMIT 1";
+        $obj = $this->Parent->getInstance(new coreauth_USER(), "username", $username);
 
-        $result = $this->conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                return $row;
-            }
+        if($obj){
+            return $obj;
+        }
+        else{
+            return false;
         }
 
     }
@@ -106,15 +123,123 @@ class CoreAuth {
     {
         $userID = $this->getCurrentUserFromSessionID();
 
-        $sql = "SELECT * FROM users WHERE id='$userID' LIMIT 1";
+        $obj = $this->Parent->getInstance(new coreauth_USER(), "id", $userID);
 
-        $result = $this->conn->query($sql);
+        if($obj){
+            return $obj->password;
+        }
+        else{
+            return false;
+        }
+    }
 
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                return $row;
-            }
-        } else {
+    /*
+       Authentication
+   */
+    public function auth($username, $password){
+
+        if(password_verify($password, $this->getPassword($username))){
+            $this->createSession($this->getUser($username)->id);
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    public function deAuth(){
+        $sessID = $_COOKIE['session'];
+
+        setcookie( "session", "NULL", strtotime( '+30 days' ), '/');
+
+        if($this->destroySession($sessID)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public function checkAuth(){
+
+        if(!isset($_COOKIE['session'])){
+            return false;
+        }
+        else if(!$this->validateSession($_COOKIE['session'])){
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+    /*
+        Session Management
+    */
+
+    public function validateSession($id){
+
+        $obj = $this->Parent->getInstance(new coreauth_SESSION(), "sessionID", $id);
+
+        if($obj){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public function destroySession($id){
+
+        $obj = $this->Parent->conditionalDeleteRow(new coreauth_SESSION(), "sessionID", $id);
+
+        if($obj){
+            unset($_COOKIE['session']);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public function createSession($userID){
+
+        $sessID = md5(time()*rand(10, 10000));
+
+        $newSession = new coreauth_SESSION();
+        $newSession->userID = $userID;
+        $newSession->sessionID = $sessID;
+
+
+        $obj = $this->Parent->insertObject($newSession);
+
+        if($obj){
+            setcookie( "session", $sessID, strtotime( '+30 days' ), '/');
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    public function getCurrentUserFromSessionID(){
+
+        if(isset($_COOKIE['session'])){
+            $sessID = $_COOKIE['session'];
+        }
+        else{
+            return false;
+        }
+
+        $obj = $this->Parent->getInstance(new coreauth_SESSION(), "sessionID", $sessID);
+
+        if($obj){
+            return $obj->userID;
+        }
+        else{
             return false;
         }
 

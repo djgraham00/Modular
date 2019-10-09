@@ -13,7 +13,7 @@ class Boilerplate {
     private $dbuser = "root";
     private $dbpass = "";
     public $PDO;
-    public $Modules;
+    public $Modules = array();
     public $loadedModNames = array();
     public $AppName = "Boilerplate Dev";
     public $Routes = array();
@@ -29,6 +29,7 @@ class Boilerplate {
 
     public function loadModules() {
 
+
         $modules = array_diff(scandir(__DIR__ . "\\modules"), array('.', '..'));
 
         $routes = array();
@@ -41,7 +42,7 @@ class Boilerplate {
                 require(__DIR__ . "/modules/$mod/" . $moduleInfo->ImportFileName);
                 $mainClass = $moduleInfo->MainClass;
 
-                ${$mod} = new $mainClass();
+                ${$mod} = new $mainClass($this);
 
                 if ($moduleInfo->HasRouteDefinitions) {
                     $routeDefinitionVar = $moduleInfo->RouteDefinitionVar;
@@ -49,7 +50,7 @@ class Boilerplate {
 
                 }
 
-                array_push($modules, array("_$mainClass" => ${$mod}));
+                $this->Modules = array_merge($this->Modules, array("_$mainClass" => ${$mod}));
                 array_push($this->loadedModNames, $mod);
             }
         }
@@ -71,6 +72,7 @@ class Boilerplate {
             $rt = array_filter($rt);
 
             $thisRoute = $this->Routes["/" . $rt[1]];
+
         }
         else{
             $rt = array("", "/");
@@ -95,13 +97,17 @@ class Boilerplate {
 
                 /* Assign each match up the variable namess and values and create the variables */
                 for ($i = 0; $i < count($varNames); $i++) {
-                    $varName = preg_replace('/(.*?)\/{(.*?)}/', '$2', $varNames[$i]);
+                    $varName = preg_replace('/{(.*?)}/', '$1', $varNames[$i]);
                     @${$varName} = $vars[$i];
                 }
 
+                include($thisRoute["template"]);
             }
         }
-        include($thisRoute["template"]);
+        else{
+            include($thisRoute["template"]);
+        }
+
     }
 
     private function isRouteDynamic($rt){
@@ -196,7 +202,7 @@ class Boilerplate {
 
     public function insertObject($obj){
 
-        if(tableExists($obj->tableName)) {
+        if($this->tableExists($obj->tableName)) {
             try {
                 $sql = "INSERT INTO ".$obj->tableName." (".$obj->generateInsertStr().") VALUES (".$obj->generateInsertVal().")";
                 $this->PDO->exec($sql);
@@ -207,8 +213,8 @@ class Boilerplate {
         }
         else{
             $objName = get_class($obj);
-            createTable(new $objName());
-            insertObject($obj);
+            $this->createTable(new $objName());
+            $this->insertObject($obj);
         }
     }
 
@@ -222,8 +228,13 @@ class Boilerplate {
 
             $objs = $getObjs->fetchAll();
 
-            foreach($objs[0] as $key=>$value){
-                $refObj->{$key} = $value;
+            if($objs != FALSE) {
+                foreach ($objs[0] as $key => $value) {
+                    $refObj->{$key} = $value;
+                }
+            }
+            else{
+                return false;
             }
 
             return $refObj;
@@ -274,8 +285,24 @@ class Boilerplate {
         }
 
         // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
-        return $result !== FALSE;
+        return true !== FALSE;
     }
+
+    public function conditionalDeleteRow($objRef, $key, $value) {
+        $table = $objRef->tableName;
+        // Try a select statement against the table
+        // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
+        try {
+            $result = $this->PDO->query("DELETE FROM $table WHERE $key='$value'");
+        } catch (Exception $e) {
+            // We got an exception == table not found
+            return FALSE;
+        }
+
+        // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
+        return true;
+    }
+
 
     public function createTable($obj){
         // Try a select statement against the table

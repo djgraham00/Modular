@@ -22,27 +22,40 @@
 </form>
 
 <script type="text/javascript">
+
 function login() {
-    $.ajax({
-        url: './src/action/authenticate/auth.php',
-        type: 'POST',
-        data: {
-            'username': $('[name=username]').val(),
-            'password': $('[name=password]').val()
-        },
-        dataType: 'json',
-        success: function (data) {
-            if(data.success === true){
-               window.location.replace ("./home");
-            }else{
-                document.getElementById("err").innerHTML = "Invalid Username or Password";
-            }
-        },
-        error: function (request, error) {
-            alert("Request: " + JSON.stringify(request));
+
+    let data = { username: document.getElementById("username").vale
+
+
+
+
+
+
+
+
+
+
+
+
+        password: document.getElementById("password").value};
+
+    console.log(JSON.stringify(data));
+
+    fetch("./_coreAuthAPI/auth", {
+        method: "POST",
+        body: JSON.stringify(data)
+    }).then(res => res.json()).then(data => {
+        console.log(data);
+        if(data === true) {
+            window.location.replace ("./coreAuthHome");
+        }
+        else{
+            document.getElementById("err").innerHTML = "Invalid Username or Password";
         }
     });
-}
+
+   }
 </script>
 </body>
 </html>
