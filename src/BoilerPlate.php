@@ -29,25 +29,30 @@ class Boilerplate {
 
     public function loadModules() {
 
+        $modDir = __DIR__ . "/modules";
 
-        $modules = array_diff(scandir(__DIR__ . "\\modules"), array('.', '..'));
+        $modules = array_diff(scandir($modDir), array('.', '..'));
 
         $routes = array();
 
         foreach ($modules as $mod) {
 
-            if (file_exists(__DIR__ . "/modules/$mod/$mod.json")) {
-                $moduleInfo = json_decode(file_get_contents(__DIR__ ."/modules/$mod/$mod.json"));
+            if (file_exists("$modDir/$mod/$mod.json")) {
+                $moduleInfo = json_decode(file_get_contents("$modDir/$mod/$mod.json"));
 
-                require(__DIR__ . "/modules/$mod/" . $moduleInfo->ImportFileName);
+                require("$modDir/$mod/" . $moduleInfo->ImportFileName);
                 $mainClass = $moduleInfo->MainClass;
 
-                ${$mod} = new $mainClass($this);
+                ${$mod} = new $mainClass($this, $moduleInfo);
 
                 if ($moduleInfo->HasRouteDefinitions) {
                     $routeDefinitionVar = $moduleInfo->RouteDefinitionVar;
                     $this->Routes = array_merge($this->Routes, ${$mod}->{$routeDefinitionVar});
-
+                }
+                
+                if(isset($moduleInfo->HasDBModels) && $moduleInfo->HasDBModels == true){
+                    $funcName = $moduleInfo->ModelsInitMethod;
+                    ${$mod}->$funcName();
                 }
 
                 $this->Modules = array_merge($this->Modules, array("_$mainClass" => ${$mod}));
@@ -61,6 +66,10 @@ class Boilerplate {
 
         $BoilerPlate = $this;
 
+        foreach($this->Modules as $key=>$value){
+            ${$key} = $value;
+        }
+
         if (isset($getVars['rt'])) {
             $route = $getVars['rt'];
         } else {
@@ -71,7 +80,15 @@ class Boilerplate {
             $rt = explode("/", $route);
             $rt = array_filter($rt);
 
+            if(!isset($this->Routes["/" . $rt[1]])){
+                //Display error page if route is not found
+                include("boilerplate/templates/404.tpl.php");
+                exit;
+            }
+
             $thisRoute = $this->Routes["/" . $rt[1]];
+
+
 
         }
         else{
@@ -218,10 +235,25 @@ class Boilerplate {
         }
     }
 
-    public function getInstance($refObj, $key, $value){
+    public function getInstance($refObj, $key, $value, $customSQL = false, $orderByID = "ASC", $limit = false){
+        
+        if(!$this->tableExists($refObj->tableName)){
+            $objName = get_class($refObj);
+            $this->createTable(new $objName());
+            $this->getInstance($refObj, $key, $value);
+        }
 
         try{
-            $sql = "SELECT * FROM ".$refObj->tableName. " WHERE $key='$value'";
+
+            $sql = "SELECT * FROM ".$refObj->tableName. " WHERE $key='$value' ORDER BY id $orderByID";
+
+            if($limit != false) {
+                $sql .= " LIMIT $limit";
+            }
+            
+            if($customSQL != false){
+                $sql = $customSQL;
+            }
 
             $getObjs = $this->PDO->prepare($sql);
             $getObjs->execute();
@@ -246,6 +278,12 @@ class Boilerplate {
     }
 
     public function getAllObjects($refObj){
+
+        if(!$this->tableExists($refObj->tableName)){
+            $objName = get_class($refObj);
+            $this->createTable(new $objName());
+            $this->getAllObjects($refObj);
+        }
 
         try{
             $sql = "SELECT * FROM ".$refObj->tableName;
@@ -278,7 +316,7 @@ class Boilerplate {
         // Try a select statement against the table
         // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
         try {
-            $result = $this->PDO->query("SELECT 1 FROM $table LIMIT 1");
+            $result = $this->PDO->query("SELECT * FROM $table LIMIT 1");
         } catch (Exception $e) {
             // We got an exception == table not found
             return FALSE;
@@ -305,18 +343,18 @@ class Boilerplate {
 
 
     public function createTable($obj){
-        // Try a select statement against the table
-        // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
-        try {
-            $result = $this->PDO->exec($obj->generateSQLModel());
-        } catch (Exception $e) {
-            // We got an exception == table not found
+            // Try a select statement against the table
+            // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
+            try {
+                $result = $this->PDO->exec($obj->generateSQLModel());
+            } catch (Exception $e) {
+                // We got an exception == table not found
+                return false;
+            }
 
-            echo $e->getMessage();
-        }
-
-        // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
-        return $result !== FALSE;
+            // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
+            return $result !== FALSE;
+         
     }
 
 }

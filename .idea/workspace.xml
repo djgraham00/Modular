@@ -2,11 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="92d554b6-0aaf-4599-b5c3-3cff7090de76" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/modules/coreauth/templates/auth.api.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BoilerPlate.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/BoilerPlate.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/bpdev/BPDevApp.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/bpdev/BPDevApp.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/bpdev/templates/index.tpl.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/bpdev/templates/index.tpl.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/modules/coreauth/CoreAuth.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/coreauth/CoreAuth.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/coreauth/coreauth.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/coreauth/coreauth.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/coreauth/models/coreauth_SESSION.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/coreauth/models/coreauth_SESSION.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/coreauth/models/coreauth_USER.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/coreauth/models/coreauth_USER.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/modules/coreauth/templates/index.tpl.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/coreauth/templates/index.tpl.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/modules/coreauth/CoreAuth.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="199" column="24" lean-forward="true" selection-start-line="199" selection-start-column="24" selection-end-line="199" selection-end-column="24" />
+            <state relative-caret-position="3740">
+              <caret line="220" column="24" selection-start-line="220" selection-start-column="24" selection-end-line="220" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -38,17 +42,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
+            <state relative-caret-position="34">
+              <caret line="2" column="1" selection-start-line="2" selection-start-column="1" selection-end-line="2" selection-end-column="1" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/modules/coreauth/templates/index.tpl.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="680">
-              <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
+            <state relative-caret-position="391">
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
@@ -56,11 +60,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/BoilerPlate.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="366">
-              <caret line="298" column="25" lean-forward="true" selection-start-line="298" selection-start-column="25" selection-end-line="298" selection-end-column="25" />
+            <state relative-caret-position="408">
+              <caret line="24" column="74" lean-forward="true" selection-start-line="24" selection-start-column="74" selection-end-line="24" selection-end-column="74" />
               <folding>
                 <element signature="e#6#50#0#PHP" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/modules/coreauth/coreauth.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
             </state>
           </provider>
         </entry>
@@ -90,21 +103,21 @@
         <option value="$PROJECT_DIR$/src/modules/coreauth/models/coreauth_SESSION.php" />
         <option value="$PROJECT_DIR$/src/autoload.php" />
         <option value="$PROJECT_DIR$/src/modules/coreauth/autoload.php" />
-        <option value="$PROJECT_DIR$/src/modules/coreauth/coreauth.json" />
         <option value="$PROJECT_DIR$/index.php" />
         <option value="$PROJECT_DIR$/src/modules/bpdev/coreauth.json" />
         <option value="$PROJECT_DIR$/src/modules/bpdev/templates/index.tpl.php" />
         <option value="$PROJECT_DIR$/src/modules/bpdev/templates/get_test.tpl.php" />
         <option value="$PROJECT_DIR$/src/modules/bpdev/BPDevApp.php" />
         <option value="$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php" />
-        <option value="$PROJECT_DIR$/src/BoilerPlate.php" />
         <option value="$PROJECT_DIR$/src/modules/coreauth/CoreAuth.php" />
         <option value="$PROJECT_DIR$/src/modules/coreauth/templates/auth.api.php" />
         <option value="$PROJECT_DIR$/src/modules/coreauth/templates/index.tpl.php" />
+        <option value="$PROJECT_DIR$/src/BoilerPlate.php" />
+        <option value="$PROJECT_DIR$/src/modules/coreauth/coreauth.json" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="433" />
     <option name="y" value="-8" />
     <option name="width" value="1400" />
@@ -116,7 +129,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -142,22 +154,16 @@
               <item name="modules" type="462c0819:PsiDirectoryNode" />
               <item name="coreauth" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="boilerplate" type="b2602c69:ProjectViewProjectNode" />
-              <item name="boilerplate" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="modules" type="462c0819:PsiDirectoryNode" />
-              <item name="coreauth" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -188,17 +194,19 @@
       <workItem from="1570378061919" duration="14202000" />
       <workItem from="1570406116239" duration="2163000" />
       <workItem from="1570408737725" duration="6755000" />
+      <workItem from="1571015725943" duration="631000" />
+      <workItem from="1571016433155" duration="41000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24941000" />
+    <option name="totallyTimeSpent" value="25613000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="32" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12846482" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13059701" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -291,13 +299,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/modules/bpdev/templates/get_test.tpl.php" />
-    <entry file="file://$PROJECT_DIR$/src/modules/coreauth/coreauth.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="5" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/modules/coreauth/models/coreauth_SESSION.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -319,27 +320,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/BoilerPlate.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="366">
-          <caret line="298" column="25" lean-forward="true" selection-start-line="298" selection-start-column="25" selection-end-line="298" selection-end-column="25" />
-          <folding>
-            <element signature="e#6#50#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/modules/coreauth/CoreAuth.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="199" column="24" lean-forward="true" selection-start-line="199" selection-start-column="24" selection-end-line="199" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
+        <state relative-caret-position="3740">
+          <caret line="220" column="24" selection-start-line="220" selection-start-column="24" selection-end-line="220" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -350,10 +334,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/modules/coreauth/templates/builtin_home.tpl.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="1" selection-start-line="2" selection-start-column="1" selection-end-line="2" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/modules/coreauth/templates/index.tpl.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/BoilerPlate.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="24" column="74" lean-forward="true" selection-start-line="24" selection-start-column="74" selection-end-line="24" selection-end-column="74" />
+          <folding>
+            <element signature="e#6#50#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/modules/coreauth/coreauth.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
         </state>
       </provider>
     </entry>

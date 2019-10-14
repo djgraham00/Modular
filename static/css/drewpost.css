@@ -1,0 +1,278 @@
+body{
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0px;
+    background-color:#F5F5F5;
+}
+
+header{
+    line-height: 64px;
+    width: 100%;
+    background-color: black;
+    clear:both;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+
+header:after{
+    clear:both;
+}
+
+aside{
+    background-color: #0066BE;
+    height: 100vh;
+    width: 200px;
+    float: left;
+    position: fixed;
+    color: #E21B34;
+}
+
+aside table{
+    margin: auto;
+}
+aside td{
+    height: 50px;
+    width: 100%;
+    color: white;
+}
+
+aside td a, a:not([href]):not([tabindex]) {
+    color: #E21B34;
+    text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000;
+    font-weight: bold;
+}
+
+aside td a:hover{
+    color: lightgray;
+}
+
+section{
+    max-width: 500px;
+    margin:auto;
+    margin-top: 20px;
+}
+
+article h2{
+    margin: 0;
+}
+
+.notificationCenter{
+     z-index: 1;
+     position: fixed;
+     margin-left: 150px;
+     margin-top: 120px;
+     float: left;
+     background-color: rgba(0, 0, 0, 0.5);
+     height: 500px;
+     width: 200px;
+     border-radius: 0px 50px 20px 50px;
+    overflow:scroll;
+ }
+.notificationCenter p {
+    display: block;
+    background-color: rgba(255, 255, 255, 0.2);
+    max-width: 100%;
+    margin: 0;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+.notificationCenter hr{
+    border: 1px solid black;
+}
+.notificationCenter a {
+
+    display:block;
+    padding-top: 10px;
+    color: white;
+}
+.notificationCenter a:hover{
+    font-weight: bold;
+}
+
+.notificationCenter h4{
+    text-align: center;
+}
+
+.notificationCenter p a{
+    display: inline;
+    padding: 0;
+}
+
+.imageOverlay{
+    z-index: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: rgba(0, 0, 0, 0.7);
+    height: 500px;
+    width: 500px;
+    text-align: center;
+}
+
+.imageOverlay img{
+    padding: 5px;
+    padding-left: 0px;
+    max-height: 450px;
+    max-width: 450px;
+}
+.imageOverlay a{
+    padding-left: 5px;
+    padding-top: 5px;
+    color: white;
+    float: left;
+}
+.post{
+    padding: 5px;
+    margin: auto;
+    margin-top: 10px;
+    border: solid lightgrey 1px;
+    background-color: white;
+    display: block;
+    text-align: left;
+    max-width: 500px;
+    clear: both;
+    margin-bottom: 5px;
+}
+.post-reply{
+    padding: 5px;
+    margin: auto;
+    border: solid lightgrey 1px;
+    background-color: white;
+    display: block;
+    text-align: left;
+    width: 450px;
+    margin-bottom: 5px;
+    float: right;
+}
+
+.img{
+    max-height: 200px;
+    max-width: 100%;
+    width: auto;
+    margin: auto;
+}
+.post-date{
+    text-align: right;
+    color: lightgrey;
+    font-size: 12px;
+}
+
+aside form{
+    max-width: 500px;
+    display: inline;
+    line-height: 64px;
+}
+
+section fieldset{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+a{
+    text-decoration: none;
+}
+
+article a{
+   color: blue;
+}
+article a:hover{
+    color: lightblue;
+}
+
+
+
+
+.active{
+    color: blue;
+}
+
+a:hover{
+    cursor: pointer;
+}
+
+.headerTextRotated{
+    -ms-transform: rotate(90deg); /* IE 9 */
+    -webkit-transform: rotate(90deg); /* Safari */
+    transform: rotate(90deg);
+}
+
+#navLink{
+    display: block;
+    float: left;
+    max-height: 64px;
+    color: white;
+}
+
+#navLink a{
+    color: white;
+}
+
+#navLink a:hover{
+    color: lightgray;;
+}
+
+#sidebar{
+    display: block;
+}
+.content{
+     height: 125px;
+     width: 100%;
+     background-color: white;
+ }
+
+ .post-input{
+     display: block;
+     width:100%;
+     height: 100px;
+     border: solid white 1px;
+     resize: none;
+
+ }
+
+ .post-input:focus{
+     outline: none;
+ }
+
+ .bg-dark, .navbar-dark{
+    background-color: black;
+ }
+
+
+.profile_picture{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+hr{
+    width: 75%;
+    display: block;
+    margin: 10px;
+}
+.post-content{
+    margin-left: 55px;
+}
+
+.reply{
+    width: 450px;
+    margin: auto;
+    position:relative
+}
+
+.reply input[type="text"]{
+    display: inline-block;
+    border: solid white 1px;
+}
+.reply input[type="text"]:focus{
+    outline: none;
+}
+.reply input[type="submit"]{
+    display: inline-block;
+}

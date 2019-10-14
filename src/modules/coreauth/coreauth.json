@@ -1,6 +1,9 @@
 {
-    "ImportFileName" : "CoreAuth.php",
-    "MainClass"      : "CoreAuth",
+    "ImportFileName"      : "CoreAuth.php",
+    "MainClass"           : "CoreAuth",
+    "HasRouteDefinitions" : true,
     "RouteDefinitionVar"  : "rts",
-    "HasRouteDefinitions" : true
+    "HasDBModels"         : true,
+    "ModelsInitMethod"    : "__initModels",
+    "LoginRdir"           : "./coreAuthHome"
 }

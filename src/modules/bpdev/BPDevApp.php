@@ -9,4 +9,12 @@ class BPDevApp {
         )
     );
 
+    public $Parent;
+    public $Config;
+
+    public function __construct($p, $c){
+        $this->Parent = $p;
+        $this->Config = $c;
+    }
+
 }

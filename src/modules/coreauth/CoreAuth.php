@@ -15,10 +15,15 @@ class CoreAuth {
             "accessTo" => array("1"),
             "template" => "modules/coreauth/templates/index.tpl.php"
         ),
-        "/_coreAuthAPI" => array(
-            "path" => "/_coreAuthAPI/auth",
+        "/_coreAuthAPI_auth" => array(
+            "path" => "/_coreAuthAPI_auth",
             "accessTo" => array("1"),
             "template" => "modules/coreauth/templates/auth.api.php"
+        ),
+        "/_coreAuthAPI_deAuth" => array(
+            "path" => "/_coreAuthAPI_deAuth",
+            "accessTo" => array("1"),
+            "template" => "modules/coreauth/templates/deauth.api.php"
         ),
         "/coreAuthHome" => array(
             "path" => "/coreAuthHome",
@@ -28,9 +33,13 @@ class CoreAuth {
     );
 
     public $Parent;
+    public $Config;
 
-    public function __construct($p){
+    public $enableLoginRedir = true;
+
+    public function __construct($p, $c){
         $this->Parent = $p;
+        $this->Config = $c;
     }
 
     /*
@@ -118,7 +127,19 @@ class CoreAuth {
         }
 
     }
+    public function getUserByID($id)
+    {
 
+        $obj = $this->Parent->getInstance(new coreauth_USER(), "id", $id);
+
+        if($obj){
+            return $obj;
+        }
+        else{
+            return false;
+        }
+
+    }
     public function getCurrentUser()
     {
         $userID = $this->getCurrentUserFromSessionID();
@@ -126,7 +147,7 @@ class CoreAuth {
         $obj = $this->Parent->getInstance(new coreauth_USER(), "id", $userID);
 
         if($obj){
-            return $obj->password;
+            return $obj;
         }
         else{
             return false;
@@ -242,6 +263,17 @@ class CoreAuth {
         else{
             return false;
         }
+    }
+
+    public function requireAuth(){
+        if(!$this->checkAuth()){
+            header("Location:".$this->Parent->BASE_URL);
+          }
+    }
+
+    public function __initModels(){
+        $this->Parent->createTable(new coreauth_USER());
+        $this->Parent->createTable(new coreauth_SESSION());
 
     }
 
