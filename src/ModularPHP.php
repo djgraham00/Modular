@@ -5,11 +5,11 @@
  *
  */
 
-class Boilerplate {
+class ModularPHP {
 
     private $dbtype = "mysql";
     private $dbhost = "localhost";
-    private $APP_DB_NAME = "bpdev";
+    private $APP_DB_NAME = "mpdev";
     private $dbuser = "root";
     private $dbpass = "";
     public $PDO;
@@ -17,7 +17,7 @@ class Boilerplate {
     public $loadedModNames = array();
     public $AppName = "Boilerplate Dev";
     public $Routes = array();
-    public $BASE_URL = "http://localhost/boilerplate/";
+    public $BASE_URL = "http://localhost/ModularPHP/";
 
 
     public function __construct()
@@ -64,7 +64,7 @@ class Boilerplate {
 
     public function render($postVars, $getVars) {
 
-        $BoilerPlate = $this;
+        $_ModuarPHP = $this;
 
         foreach($this->Modules as $key=>$value){
             ${$key} = $value;
