@@ -1,10 +1,10 @@
 {
-  "APP_NAME"    : "ModularPHP",
+  "APP_NAME"        : "<YOUR_APP_NAME>",
   "APP_MODULE_DIR"  : "modules",
-  "APP_BASE_URL": "http://localhost/ModularPHP2/",
-  "APP_DB_TYPE" : "mysql",
-  "APP_DB_HOST" : "localhost",
-  "APP_DB_NAME": "mpdev",
-  "APP_DB_USER" : "root",
-  "APP_DB_PASS" : ""
+  "APP_BASE_URL"    : "<YOUR_BASE_URL>",
+  "APP_DB_TYPE"     : "mysql",
+  "APP_DB_HOST"     : "localhost",
+  "APP_DB_NAME"     : "<YOUR_DB_NAME>",
+  "APP_DB_USER"     : "<YOUR_DB_USERNAME>",
+  "APP_DB_PASS"     : "<YOUR_DB_PASSWORD>"
 }
