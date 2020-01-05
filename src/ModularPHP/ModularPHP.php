@@ -1,70 +1,135 @@
 <?php
 /**
- * Drew Graham
- * Date: 10/2/2019
- *
+ * ModularPHP
+ * Created by Drew Graham (https://drewjgraham.com)
+ * Creation Date: 10/2/2019
+ * Updated : 1/4/2020
  */
 
+require ("classes/dbmodel.php");
+$moduleFolder = "";
+
+if(file_exists(__dir__ . "/../application.json")) {
+    $cfg = json_decode(file_get_contents(__dir__."/../application.json"));
+
+    if(is_string($cfg->APP_MODULE_DIR)) {
+        $moduleFolder = $cfg->APP_MODULE_DIR;
+    }
+    else {
+        echo "APPLICATION FAILED TO START; INVALID MODULE DIRECTORY";
+        exit;
+    }
+}
+
+$modDir = __dir__ . "/../" . $moduleFolder;
+
+//Scan the modules directory for potential modules
+$modules = array_diff(scandir($modDir), array('.', '..'));
+
+//Create an array to store the loaded modules
+$mods = array();
+
+//Loop through the potential modules
+foreach ($modules as $mod) {
+    //Check if a configuration file exists for the module
+    if (file_exists("$modDir/$mod/$mod.json")) {
+        //If so, decode the configuration
+        $moduleInfo = json_decode(file_get_contents("$modDir/$mod/$mod.json"));
+
+        //Then, import the main class for that module
+        require("$modDir/$mod/" . $moduleInfo->ImportFileName);
+
+        //Also, add the module information to the loaded module array
+        $mods[$mod] = $moduleInfo;
+
+        //Next, require the database modules if any exist for the given module
+        if(isset($moduleInfo->HasDBModels) && $moduleInfo->HasDBModels == true && isset($moduleInfo->MOD_MODEL_DIR)){
+            foreach ((array_diff(scandir("$modDir/$mod/{$moduleInfo->MOD_MODEL_DIR}"), array('.', '..'))) as $dbmodel) {
+                require("$modDir/$mod/{$moduleInfo->MOD_MODEL_DIR}/$dbmodel");
+            }
+        }
+
+    }
+}
+
+/*
+ *
+ * ModularPHP Base Class
+ * Contains the base code for ModularPHP
+ * Essential functionality such as module loading, rendering, routing, and database manipulation
+ */
 class ModularPHP {
 
-    private $dbtype = "mysql";
-    private $dbhost = "localhost";
-    private $APP_DB_NAME = "mpdev";
-    private $dbuser = "root";
-    private $dbpass = "";
+    //Application Configuration (defaults, loaded from application.json if exists)
+    private $APP_DB_TYPE    = "mysql";
+    private $APP_DB_HOST    = "localhost";
+    private $APP_DB_NAME    = "mpdev";
+    private $APP_DB_USER    = "root";
+    private $APP_DB_PASS    = "";
+    private $APP_MODULE_DIR = "";
+    public $APP_NAME       = "";
+    public $APP_BASE_URL   = "";
+
+    //Public Variables
     public $PDO;
     public $Modules = array();
     public $loadedModNames = array();
-    public $AppName = "Boilerplate Dev";
     public $Routes = array();
-    public $BASE_URL = "http://localhost/ModularPHP/";
-
 
     public function __construct()
     {
-        $this->PDO = new PDO($this->dbtype . ":host=" . $this->dbhost . ";dbname=" . $this->APP_DB_NAME, $this->dbuser, $this->dbpass);
+        //Load the application configuration
+        $this->loadConfig();
+
+        //Initiate a connection to the database using the provided information
+        $this->PDO = new PDO($this->APP_DB_TYPE . ":host=" . $this->APP_DB_HOST . ";dbname=" . $this->APP_DB_NAME, $this->APP_DB_USER, $this->APP_DB_PASS);
+
+        //Load all of the modules
         $this->loadModules();
 
     }
 
-    public function loadModules() {
-
-        $modDir = __DIR__ . "/modules";
-
-        $modules = array_diff(scandir($modDir), array('.', '..'));
-
-        $routes = array();
-
-        foreach ($modules as $mod) {
-
-            if (file_exists("$modDir/$mod/$mod.json")) {
-                $moduleInfo = json_decode(file_get_contents("$modDir/$mod/$mod.json"));
-
-                require("$modDir/$mod/" . $moduleInfo->ImportFileName);
-                $mainClass = $moduleInfo->MainClass;
-
-                ${$mod} = new $mainClass($this, $moduleInfo);
-
-                if ($moduleInfo->HasRouteDefinitions) {
-                    $routeDefinitionVar = $moduleInfo->RouteDefinitionVar;
-                    $this->Routes = array_merge($this->Routes, ${$mod}->{$routeDefinitionVar});
-                }
-                
-                if(isset($moduleInfo->HasDBModels) && $moduleInfo->HasDBModels == true){
-                    $funcName = $moduleInfo->ModelsInitMethod;
-                    ${$mod}->$funcName();
-                }
-
-                $this->Modules = array_merge($this->Modules, array("_$mainClass" => ${$mod}));
-                array_push($this->loadedModNames, $mod);
+    private function loadConfig() {
+        $filePath = __DIR__ . "/../application.json";
+        if(file_exists($filePath)) {
+            $cfg = json_decode(file_get_contents($filePath));
+            foreach ($cfg as $opt=>$val) {
+                $this->{$opt} = $val;
             }
+            return true;
         }
+        else {
+            return false;
+        }
+    }
 
-     }
+    private function loadModules() {
+        global $mods;
+
+        foreach ($mods as $modName=>$modInfo) {
+
+            $mainClass = $modInfo->MainClass;
+
+            ${$modName} = new $mainClass($this, $modInfo);
+
+            if ($modInfo->HasRouteDefinitions) {
+                $routeDefinitionVar = $modInfo->RouteDefinitionVar;
+                $this->Routes = array_merge($this->Routes, ${$modName}->{$routeDefinitionVar});
+            }
+
+            /* if(isset($modInfo->HasDBModels) && $modInfo->HasDBModels == true){
+                $funcName = $modInfo->ModelsInitMethod;
+                ${$modName}->$funcName();
+            } */
+
+            $this->Modules = array_merge($this->Modules, array("_$mainClass" => ${$modName}));
+            array_push($this->loadedModNames, $modName);
+        }
+    }
 
     public function render($postVars, $getVars) {
 
-        $_ModuarPHP = $this;
+        $ModularPHP = $this;
 
         foreach($this->Modules as $key=>$value){
             ${$key} = $value;
@@ -82,7 +147,7 @@ class ModularPHP {
 
             if(!isset($this->Routes["/" . $rt[1]])){
                 //Display error page if route is not found
-                include("boilerplate/templates/404.tpl.php");
+                include("templates/404.tpl.php");
                 exit;
             }
 
@@ -112,21 +177,26 @@ class ModularPHP {
                 unset($varNames[1]);
                 $varNames = array_values($varNames);
 
-                /* Assign each match up the variable namess and values and create the variables */
+                /* Assign each match up the variable names and values and create the variables */
                 for ($i = 0; $i < count($varNames); $i++) {
                     $varName = preg_replace('/{(.*?)}/', '$1', $varNames[$i]);
                     @${$varName} = $vars[$i];
                 }
 
-                include($thisRoute["template"]);
+                include(__dir__ . "/../". $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
             }
         }
         else{
-            include($thisRoute["template"]);
+            include(__dir__ . "/../". $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
         }
 
     }
 
+    /**
+     * Tests if a route is passing data to the requested page
+     * @param string $rt
+     * @return bool
+     */
     private function isRouteDynamic($rt){
 
         if (isset($this->Routes["/$rt"])){
@@ -143,6 +213,11 @@ class ModularPHP {
         }
     }
 
+    /**
+     * Checks if a module has been loaded
+     * @param string $module This is name of a module
+     * @return bool
+     */
     public function hasMod($module){
         if(in_array($module, $this->loadedModNames)) {
             return true;
@@ -152,67 +227,10 @@ class ModularPHP {
         }
     }
 
-    /*
-     * OLD RENDER FUNCTION
-     *
-     * public function render($postVars, $getVars){
-
-        $BoilerPlate = $this;
-
-        if(isset($getVars['rt'])){
-            $route = $getVars['rt'];
-        }
-        else {
-            $route = "/";
-        }
-
-        if($this->checkAuth() && $route == "/"){
-            header("Location: ./home");
-        } else if($route == "/"){
-            header("Location: ./login");
-        }
-
-        if(isset($this->Routes[$route])){
-            $rt = $this->Routes[$route];
-
-            if(!$this->checkAuth()){
-                $roles = "0";
-            }
-            else{
-                $roles = $this->getUserRoles($this->getCurrentUser()['id']);
-            }
-
-            $access = false;
-
-            if($roles != "0"){
-                foreach ($roles as $role){
-                    if(in_array($role, $rt['accessTo'])){
-                        $access = true;
-                    }
-                }
-            }
-
-            if($rt["accessTo"] != null){
-                if($access){
-                    include("templates/".$rt["template"]);
-                }
-                else{
-                    include("templates/errors/403.tpl.php");
-                }
-            }
-            else{
-                include("templates/".$rt["template"]);
-            }
-        }
-        else{
-            include("templates/errors/404.tpl.php");
-        }
-
-    } */
 
     /*
      *
-     * Boilerplate Database Function
+     * <ModularPHP> Database Function
      *
      */
 
@@ -236,7 +254,7 @@ class ModularPHP {
     }
 
     public function getInstance($refObj, $key, $value, $customSQL = false, $orderByID = "ASC", $limit = false){
-        
+
         if(!$this->tableExists($refObj->tableName)){
             $objName = get_class($refObj);
             $this->createTable(new $objName());
@@ -250,7 +268,7 @@ class ModularPHP {
             if($limit != false) {
                 $sql .= " LIMIT $limit";
             }
-            
+
             if($customSQL != false){
                 $sql = $customSQL;
             }
@@ -343,18 +361,18 @@ class ModularPHP {
 
 
     public function createTable($obj){
-            // Try a select statement against the table
-            // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
-            try {
-                $result = $this->PDO->exec($obj->generateSQLModel());
-            } catch (Exception $e) {
-                // We got an exception == table not found
-                return false;
-            }
+        // Try a select statement against the table
+        // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
+        try {
+            $result = $this->PDO->exec($obj->generateSQLModel());
+        } catch (Exception $e) {
+            // We got an exception == table not found
+            return false;
+        }
 
-            // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
-            return $result !== FALSE;
-         
+        // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
+        return $result !== FALSE;
+
     }
 
 }

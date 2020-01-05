@@ -8,7 +8,8 @@
 header("Content-Type: application/json");
 error_reporting(0);
 ini_set('display_errors', 0);
-if($BoilerPlate->Modules["_CoreAuth"]->auth($_POST['username'], $_POST['password'])){
+
+if($ModularPHP->Modules['_CoreAuth']->auth($_POST['username'], $_POST['password'])){
     echo '{ "success" : true }';
 }
 else {

@@ -1,8 +1,9 @@
+<?php $_CoreAuth->loginRedir(); ?>
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title><?= $BoilerPlate->AppName; ?></title>
-    <base href="<?= $BoilerPlate->BASE_URL ?>" target="_blank">
+    <title><?= $ModularPHP->APP_NAME; ?></title>
+    <base href="<?= $ModularPHP->APP_BASE_URL ?>" target="_blank">
     <link rel="stylesheet" href="static/css/bootstrap.min.css">
     <script type="text/javascript" src="static/js/jquery.js"></script>
     <script type="text/javascript" src="static/js/coreauth.js"></script>
@@ -12,7 +13,7 @@
 </head>
 <body class="text-center">
 <form class="form-signin" method="post" onsubmit='login("<?= $_CoreAuth->Config->LoginRdir; ?>");return false;'>
-<h1 class="h3 mb-3 font-weight-normal"><?= $BoilerPlate->AppName; ?></h1>
+<h1 class="h3 mb-3 font-weight-normal"><?= $ModularPHP->APP_NAME; ?></h1>
     <span style="color: red; font-weight:bold" id="err"></span>
     <label for="inputUsername" class="sr-only">Username</label>
         <input type="text" id="username" name="username"  class="form-control" placeholder="Username" required autofocus>

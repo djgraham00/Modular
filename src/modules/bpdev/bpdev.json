@@ -1,6 +1,0 @@
-{
-    "ImportFileName" : "BPDevApp.php",
-    "MainClass"      : "BPDevApp",
-    "RouteDefinitionVar"  : "rts",
-    "HasRouteDefinitions" : true
-}

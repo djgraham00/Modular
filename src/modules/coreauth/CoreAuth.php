@@ -1,34 +1,36 @@
 <?php
-require("models/coreauth_USER.php");
-require("models/coreauth_SESSION.php");
-
 class CoreAuth {
 
     public $rts = array(
+        "/" => array(
+            "path" => "/",
+            "accessTo" => array("1"),
+            "template" => "coreauth/templates/auto.routing.php"
+        ),
         "/login" => array(
             "path" => "/login",
             "accessTo" => array("1"),
-            "template" => "modules/coreauth/templates/index.tpl.php"
+            "template" => "coreauth/templates/index.tpl.php"
         ),
         "/createAccount" => array(
             "path" => "/login",
             "accessTo" => array("1"),
-            "template" => "modules/coreauth/templates/index.tpl.php"
+            "template" => "coreauth/templates/index.tpl.php"
         ),
         "/_coreAuthAPI_auth" => array(
             "path" => "/_coreAuthAPI_auth",
             "accessTo" => array("1"),
-            "template" => "modules/coreauth/templates/auth.api.php"
+            "template" => "coreauth/templates/auth.api.php"
         ),
         "/_coreAuthAPI_deAuth" => array(
             "path" => "/_coreAuthAPI_deAuth",
             "accessTo" => array("1"),
-            "template" => "modules/coreauth/templates/deauth.api.php"
+            "template" => "coreauth/templates/deauth.api.php"
         ),
         "/coreAuthHome" => array(
             "path" => "/coreAuthHome",
             "accessTo" => array("1"),
-            "template" => "modules/coreauth/templates/builtin_home.tpl.php"
+            "template" => "coreauth/templates/builtin_home.tpl.php"
         )
     );
 
@@ -41,29 +43,6 @@ class CoreAuth {
         $this->Parent = $p;
         $this->Config = $c;
     }
-
-    /*
-        Account Management
-    */
-    /* public function createAccount($firstName, $lastName, $username, $password, $orgParent, $passwordUpdated, $gradeLevel)
-    {
-        if (!$this->checkAuth()) {
-            exit;
-        }
-
-
-        $sql = "INSERT INTO users (`sisID`, `firstName`, `lastName`, `username`, `password`, `orgParent`, `passwordUpdated`, `gradeLevel`) VALUES ('$sisID', '$firstName', '$lastName', '$username','$password', '$orgParent', '$passwordUpdated'
-    , '$gradeLevel')";
-
-        $result = $this->conn->query($sql);
-
-        if ($result === TRUE) {
-            return true;
-        } else {
-            return false;
-        }
-
-    } */
 
     public function getPassword($username)
     {
@@ -79,40 +58,20 @@ class CoreAuth {
 
     }
 
-   /* public function getUsername($param)
+   public function getUsername($param)
     {
 
-        $sql = "SELECT username FROM users WHERE username='$param' LIMIT 1";
+        $obj = $this->Parent->getInstance(new coreauth_USER(), "username", $param);
 
-        $result = $this->conn->query($sql);
-        if ($result->num_rows > 0) {
-            while ($result->fetch_assoc()) {
-                return $row;
-            }
-        } else {
+        if($obj){
+            return $obj->username;
+        }
+        else{
             return false;
         }
 
-    } */
 
-    /* public function getUserRoles($userID)
-    {
-
-        $sql = "SELECT * FROM accesscontrol WHERE userID='$userID'";
-
-        $tmp = array();
-
-        $result = $this->conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                array_push($tmp, $row['role']);
-            }
-        }
-
-        return $tmp;
-
-    } */
+    }
 
     public function getUser($username)
     {
@@ -204,7 +163,7 @@ class CoreAuth {
 
         $obj = $this->Parent->getInstance(new coreauth_SESSION(), "sessionID", $id);
 
-        if($obj){
+        if(is_object($obj)){
             return true;
         }
         else{
@@ -267,9 +226,15 @@ class CoreAuth {
 
     public function requireAuth(){
         if(!$this->checkAuth()){
-            header("Location:".$this->Parent->BASE_URL);
+            header("Location:".$this->Parent->APP_BASE_URL);
           }
     }
+
+    public function loginRedir() {
+        if($this->checkAuth()) {
+            header("Location: {$this->Config->LoginRdir}");
+        }
+     }
 
     public function __initModels(){
         $this->Parent->createTable(new coreauth_USER());

@@ -4,6 +4,7 @@
     "HasRouteDefinitions" : true,
     "RouteDefinitionVar"  : "rts",
     "HasDBModels"         : true,
+    "MOD_MODEL_DIR"       : "models",
     "ModelsInitMethod"    : "__initModels",
     "LoginRdir"           : "./coreAuthHome"
 }

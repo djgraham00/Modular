@@ -1,6 +1,6 @@
 <?php
-require("src/ModularPHP.php");
+require("src/ModularPHP/ModularPHP.php");
 
-$bp = new ModularPHP();
+$MP = new ModularPHP();
 
-$bp->render($_POST, $_GET);
+$MP->render($_POST, $_GET);
