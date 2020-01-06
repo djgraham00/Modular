@@ -26,3 +26,6 @@ ModularPHP is very centric on the idea that related portions of the application 
     "LoginRdir"           : "./coreAuthHome"
 }
 ```
+
+## Contact
+If you have any questions about ModularPHP or would like to help out with the project, please feel free to send me an email to d@drewjgraham.com.
