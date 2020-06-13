@@ -1,4 +1,4 @@
-![Modular Logo](https://github.com/djgraham00/djgraham00.github.io/raw/master/modular_logo.png)
+<img src="https://github.com/djgraham00/djgraham00.github.io/raw/master/modular_logo.png" alt="Modular Logo" width="200"/>
 A easy to use, and simple web application framework for modular development.
 
 ### IMPORTANT
