@@ -1,4 +1,4 @@
-<img src="https://github.com/djgraham00/djgraham00.github.io/raw/master/modular_logo.png" alt="Modular Logo" width="200"/>
+<img src="https://github.com/djgraham00/djgraham00.github.io/raw/master/modular_logo.png" alt="Modular Logo" width="300"/>
 A easy to use, and simple web application framework for modular development.
 
 ### IMPORTANT
