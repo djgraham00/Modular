@@ -1,4 +1,4 @@
-# Modular
+![Modular Logo](https://github.com/djgraham00/djgraham00.github.io/raw/master/modular_logo.png)
 A easy to use, and simple web application framework for modular development.
 
 ### IMPORTANT
