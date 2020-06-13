@@ -1,4 +1,6 @@
-<?php $_CoreAuth_Enterprise->loginRedir(); ?>
+<?php $_CoreAuth_Enterprise->loginRedir();
+
+?>
 <!DOCTYPE HTML>
 <html>
 <head>

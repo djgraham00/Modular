@@ -21,7 +21,24 @@ class MPComponent {
 
         $reflection = new ReflectionClass($this);
 
-        include(dirname($reflection->getFileName()) . "\\" . $this->template);
+        if(MPHelper::contains(".twig", $this->template)) {
+            $loader = new \Twig\Loader\FilesystemLoader(dirname($reflection->getFileName()) );
+            $twig = new \Twig\Environment($loader, [
+                'cache' => __dir__.'/../cache',
+            ]);
+
+            $twigArray = array();
+
+            foreach ($this as $k => $v) {
+                $twigArray[$k] = $v;
+            }
+
+            echo $twig->render($this->template, $twigArray);
+
+        } else {
+            include(dirname($reflection->getFileName()) . "\\" . $this->template);
+        }
+
     }
 
     public function getFields()

@@ -9,6 +9,7 @@
 require ("classes/dbmodel.php");
 require ("classes/MPComponent.php");
 require ("classes/MPModule.php");
+require ("inc/vendor/autoload.php");
 
 $moduleFolder = "";
 
@@ -100,6 +101,8 @@ class ModularPHP {
 
         $this->MP_DIR = __DIR__; //dirname(__FILE__);
         $this->MOD_DIR = $this->MP_DIR . "/../" . $this->APP_MODULE_DIR;
+
+        $this->Modules = array_merge($this->Modules, array("_ModularPHP" => $this));
 
     }
 
@@ -212,6 +215,9 @@ class ModularPHP {
             $rt = array("", "/");
             $thisRoute = $this->Routes["/"];
         }
+
+        $modDir = $this->Modules["_".$thisRoute["mod"]]->Config->MOD_TEMPLATE_DIR;
+
         if ($this->isRouteDynamic($rt[1])) {
 
             if (count($rt) > 1) {
@@ -235,10 +241,21 @@ class ModularPHP {
                     @${$varName} = $vars[$i];
                 }
 
+
                 if(isset($thisRoute["component"])) {
                     $this->loadComponent($thisRoute);
                 } else {
-                    include(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+                    if(MPHelper::contains(".twig", $thisRoute["template"])) {
+                        $loader = new \Twig\Loader\FilesystemLoader(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["mod"] . "/" . $modDir);
+                        $twig = new \Twig\Environment($loader, [
+                            'cache' => __dir__.'/ModularPHP/cache',
+                        ]);
+
+                        echo $twig->render('index.html', $this->Modules);
+
+                    } else {
+                        include(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+                    }
                 }
             }
         }
@@ -246,7 +263,18 @@ class ModularPHP {
             if(isset($thisRoute["component"])) {
                 $this->loadComponent($thisRoute);
             } else {
-                include(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+                if(MPHelper::contains(".twig", $thisRoute["template"])) {
+                    $loader = new \Twig\Loader\FilesystemLoader(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["mod"] . "/". $modDir);
+                    $twig = new \Twig\Environment($loader, [
+                        'cache' => __dir__.'/ModularPHP/cache',
+                    ]);
+
+                    echo $twig->render($thisRoute["template"], $this->Modules);
+
+                } else {
+                    include(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+                }
+
             }
         }
 
@@ -494,4 +522,12 @@ class ModularPHP {
 
     }
 
+}
+
+class MPHelper {
+    // returns true if $needle is a substring of $haystack
+    public static function contains($needle, $haystack)
+    {
+        return strpos($haystack, $needle) !== false;
+    }
 }

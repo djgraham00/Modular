@@ -1,7 +1,7 @@
 <?php
 
 class ShowUsersController extends MPComponent {
-    public $template = "showUsers.php";
+    public $template = "showUsers.twig";
 
     public $users;
 

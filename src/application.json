@@ -2,7 +2,7 @@
   "APP_NAME"        : "ModularPHP Test Application",
   "APP_ORG"         : "NA",
   "APP_MODULE_DIR"  : "modules",
-  "APP_BASE_URL"    : "http://localhost/MP2/",
+  "APP_BASE_URL"    : "http://localhost/Modular-dev/Modular/",
   "APP_DB_TYPE"     : "mysql",
   "APP_DB_HOST"     : "localhost",
   "APP_DB_NAME"     : "mpdev",

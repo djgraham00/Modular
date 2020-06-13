@@ -6,6 +6,7 @@
     "MOD_HAS_MODELS"      : true,
     "MOD_MODEL_DIR"       : "models",
     "MOD_COMPONENT_DIR"   : "components",
+    "MOD_TEMPLATE_DIR"    : "templates",
     "MOD_MODEL_INIT"      : "__initModels",
     "LoginRdir"           : "./auto",
     "APP_HOME_URL"        : "./coreAuthHome"

@@ -49,14 +49,14 @@ class dbmodel {
         $count = 1;
         foreach ($fields as $f) {
             if($f == "id") {
-                if($f !=  "int(11) NOT NULL") {
-                    $fieldsStr .= "$f";
+                if($this->{$f} !=  "int(11) NOT NULL") {
+                    $fieldsStr .= ",$f";
                     if ($count < count($fields) - 1) {
                         $fieldsStr .= ",";
                     }
                 }
             } else {
-                if ($f != "id") {
+                if ($f != "id" && $f != "tableName") {
                     $fieldsStr .= "$f";
                     if ($count < count($fields) - 1) {
                         $fieldsStr .= ",";
@@ -74,10 +74,19 @@ class dbmodel {
         $fieldsStr = "";
         $count = 1;
         foreach ($this as $f => $v) {
-            if ($f != "id" && $f != "tableName") {
-                $fieldsStr .= "'$v'";
-                if ($count < count($this->getFields())) {
-                    $fieldsStr .= ",";
+            if($f == "id") {
+                if($v != "int(11) NOT NULL") {
+                    $fieldsStr .= ",'$v'";
+                    if ($count < count($this->getFields())) {
+                        $fieldsStr .= ",";
+                    }
+                }
+            } else {
+                if($f != "tableName") {
+                    $fieldsStr .= "'$v'";
+                    if ($count < count($this->getFields())) {
+                        $fieldsStr .= ",";
+                    }
                 }
             }
             $count++;

@@ -46,6 +46,10 @@ class CoreAuth_Enterprise extends MPModule {
         "/users" => array(
             "path"  => "/users",
             "component" => "ShowUsers"
+        ),
+        "/TwigTest" => array(
+            "path" => "/TwigTest",
+            "template" => "test.twig"
         )
     );
 

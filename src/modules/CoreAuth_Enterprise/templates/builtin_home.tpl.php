@@ -15,6 +15,9 @@
 <p>To logout, please click <button onclick="deAuth()">this button.</button>.</p>
 
 <?php $_CoreAuth_Enterprise->getComponent("ShowUsers"); ?>
+<hr/>
+<?php
 
+?>
 </body>
 </html>
