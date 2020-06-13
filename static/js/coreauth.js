@@ -28,7 +28,7 @@ function deAuth(){
             if(data.success === true){
                window.location.replace (redirectLocation);
             }else{
-                document.getElementById("err").innerHTML = "Invalid Username or Password";
+                addAlert("danger", "Invalid Username or Password...");
             }
         },
         error: function (request, error) {

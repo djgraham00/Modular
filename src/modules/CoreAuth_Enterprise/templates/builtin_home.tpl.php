@@ -1,5 +1,5 @@
 <?php
-  $_CoreAuth->requireAuth();
+  $_CoreAuth_Enterprise->requireAuth();
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -13,5 +13,8 @@
 <h1>Welcome to CoreAuth</h1>
 <p>You have been successfully authenticated!</p>
 <p>To logout, please click <button onclick="deAuth()">this button.</button>.</p>
+
+<?php $_CoreAuth_Enterprise->getComponent("ShowUsers"); ?>
+
 </body>
 </html>

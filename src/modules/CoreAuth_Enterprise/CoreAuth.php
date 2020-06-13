@@ -1,53 +1,66 @@
 <?php
-class CoreAuth {
+
+class CoreAuth_Enterprise extends MPModule {
 
     public $rts = array(
         "/" => array(
             "path" => "/",
             "accessTo" => array("1"),
-            "template" => "coreauth/templates/auto.routing.php"
+            "template" => "CoreAuth_Enterprise/templates/auto.routing.php"
+        ),
+        "/auto" => array(
+            "path" => "/auto",
+            "accessTo" => array("1"),
+            "template" => "CoreAuth_Enterprise/templates/auto.routing.php"
         ),
         "/login" => array(
             "path" => "/login",
             "accessTo" => array("1"),
-            "template" => "coreauth/templates/index.tpl.php"
+            "template" => "CoreAuth_Enterprise/templates/index.tpl.php"
         ),
         "/createAccount" => array(
             "path" => "/login",
             "accessTo" => array("1"),
-            "template" => "coreauth/templates/index.tpl.php"
+            "template" => "CoreAuth_Enterprise/templates/index.tpl.php"
         ),
         "/_coreAuthAPI_auth" => array(
             "path" => "/_coreAuthAPI_auth",
             "accessTo" => array("1"),
-            "template" => "coreauth/templates/auth.api.php"
+            "template" => "CoreAuth_Enterprise/templates/auth.api.php"
         ),
         "/_coreAuthAPI_deAuth" => array(
             "path" => "/_coreAuthAPI_deAuth",
             "accessTo" => array("1"),
-            "template" => "coreauth/templates/deauth.api.php"
+            "template" => "CoreAuth_Enterprise/templates/deauth.api.php"
         ),
         "/coreAuthHome" => array(
             "path" => "/coreAuthHome",
             "accessTo" => array("1"),
-            "template" => "coreauth/templates/builtin_home.tpl.php"
+            "template" => "CoreAuth_Enterprise/templates/builtin_home.tpl.php"
+        ),
+        "/passwordResetSelfService" => array(
+            "path" => "/passwordResetSelfService",
+            "accessTo" => array("1"),
+            "template" => "CoreAuth_Enterprise/templates/passwordreset.tpl.php"
+        ),
+        "/users" => array(
+            "path"  => "/users",
+            "component" => "ShowUsers"
         )
     );
 
-    public $Parent;
-    public $Config;
 
     public $enableLoginRedir = true;
 
-    public function __construct($p, $c){
-        $this->Parent = $p;
-        $this->Config = $c;
+    protected function init()
+    {
+
     }
 
     public function getPassword($username)
     {
 
-       $obj = $this->Parent->getInstance(new coreauth_USER(), "username", $username);
+       $obj = $this->Parent->getObject(new coreauth_USER(), array("username" => $username));
 
        if($obj){
            return $obj->password;
@@ -61,7 +74,7 @@ class CoreAuth {
    public function getUsername($param)
     {
 
-        $obj = $this->Parent->getInstance(new coreauth_USER(), "username", $param);
+        $obj = $this->Parent->getObject(new coreauth_USER(), array("username"=> $param));
 
         if($obj){
             return $obj->username;
@@ -76,7 +89,7 @@ class CoreAuth {
     public function getUser($username)
     {
 
-        $obj = $this->Parent->getInstance(new coreauth_USER(), "username", $username);
+        $obj = $this->Parent->getObject(new coreauth_USER(), array("username" => $username));
 
         if($obj){
             return $obj;
@@ -89,7 +102,7 @@ class CoreAuth {
     public function getUserByID($id)
     {
 
-        $obj = $this->Parent->getInstance(new coreauth_USER(), "id", $id);
+        $obj = $this->Parent->getObject(new coreauth_USER(), array("id" => $id));
 
         if($obj){
             return $obj;
@@ -103,7 +116,7 @@ class CoreAuth {
     {
         $userID = $this->getCurrentUserFromSessionID();
 
-        $obj = $this->Parent->getInstance(new coreauth_USER(), "id", $userID);
+        $obj = $this->Parent->getObject(new coreauth_USER(), array("id" => $userID));
 
         if($obj){
             return $obj;
@@ -118,11 +131,10 @@ class CoreAuth {
    */
     public function auth($username, $password){
 
-        if(password_verify($password, $this->getPassword($username))){
+        if (password_verify($password, $this->getPassword($username))) {
             $this->createSession($this->getUser($username)->id);
             return true;
-        }
-        else{
+        } else {
             return false;
         }
 
@@ -161,9 +173,20 @@ class CoreAuth {
 
     public function validateSession($id){
 
-        $obj = $this->Parent->getInstance(new coreauth_SESSION(), "sessionID", $id);
+        $obj = $this->Parent->getObject(new coreauth_SESSION(), array("sessionID" => $id));
 
         if(is_object($obj)){
+
+            if($obj->ipAddress != $_SERVER["REMOTE_ADDR"]) {
+                $this->destroySession($_COOKIE['session']);
+                return false;
+            }
+
+            /*if(strtotime('+1 day', $obj->date) > $obj->date) {
+                $this->destroySession($_COOKIE['session']);
+                return false;
+            }*/
+
             return true;
         }
         else{
@@ -189,19 +212,16 @@ class CoreAuth {
         $sessID = md5(time()*rand(10, 10000));
 
         $newSession = new coreauth_SESSION();
-        $newSession->userID = $userID;
+        $newSession->userID    = $userID;
         $newSession->sessionID = $sessID;
+        $newSession->ipAddress = $_SERVER['REMOTE_ADDR'];
+        $newSession->date      = time();
+
+        $newSession->save();
+
+        setcookie( "session", $sessID, strtotime( '+30 days' ), '/');
 
 
-        $obj = $this->Parent->insertObject($newSession);
-
-        if($obj){
-            setcookie( "session", $sessID, strtotime( '+30 days' ), '/');
-            return true;
-        }
-        else {
-            return false;
-        }
 
     }
 
@@ -214,7 +234,7 @@ class CoreAuth {
             return false;
         }
 
-        $obj = $this->Parent->getInstance(new coreauth_SESSION(), "sessionID", $sessID);
+        $obj = $this->Parent->getObject(new coreauth_SESSION(), array("sessionID" => $sessID));
 
         if($obj){
             return $obj->userID;
@@ -224,6 +244,7 @@ class CoreAuth {
         }
     }
 
+
     public function requireAuth(){
         if(!$this->checkAuth()){
             header("Location:".$this->Parent->APP_BASE_URL);
@@ -232,14 +253,15 @@ class CoreAuth {
 
     public function loginRedir() {
         if($this->checkAuth()) {
-            header("Location: {$this->Config->LoginRdir}");
+            header("Location: " . $this->Config->APP_HOME_URL);
         }
      }
 
-    public function __initModels(){
+
+
+    public function __initModels() {
         $this->Parent->createTable(new coreauth_USER());
         $this->Parent->createTable(new coreauth_SESSION());
-
     }
 
 }

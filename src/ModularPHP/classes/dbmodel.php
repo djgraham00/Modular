@@ -1,5 +1,7 @@
 <?php
 
+require ("MPDatabaseHandler.php");
+
 class dbmodel {
 
     public $tableName = "";
@@ -46,10 +48,19 @@ class dbmodel {
         $fieldsStr = "";
         $count = 1;
         foreach ($fields as $f) {
-            if ($f != "id") {
-                $fieldsStr .= "$f";
-                if ($count < count($fields) - 1) {
-                    $fieldsStr .= ",";
+            if($f == "id") {
+                if($f !=  "int(11) NOT NULL") {
+                    $fieldsStr .= "$f";
+                    if ($count < count($fields) - 1) {
+                        $fieldsStr .= ",";
+                    }
+                }
+            } else {
+                if ($f != "id") {
+                    $fieldsStr .= "$f";
+                    if ($count < count($fields) - 1) {
+                        $fieldsStr .= ",";
+                    }
                 }
             }
             $count++;
@@ -73,6 +84,42 @@ class dbmodel {
         }
 
         return $fieldsStr;
+    }
+
+    public function save() {
+        $return = false;
+
+        if ($this->id != "int(11) NOT NULL") {
+            $return = MPDatabaseHandler::deleteObject($this);
+            $return = $return & MPDatabaseHandler::insertObject($this);
+        } else {
+            $return = $return & MPDatabaseHandler::insertObject($this);
+        }
+
+        return $return;
+    }
+
+    public static function GetWhereID($id) {
+
+        $class = static::class;
+        $obj = new $class();
+
+        return MPDatabaseHandler::getInstance($obj, "id", $id);
+
+    }
+
+    public static function GetAll() {
+        $class = static::class;
+        $obj = new $class();
+        return MPDatabaseHandler::getAllObjects($obj);
+    }
+
+    public static function GetWhere($where) {
+
+    }
+
+    public static function GetAllWhere($where) {
+
     }
 
 }
