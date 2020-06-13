@@ -1,6 +1,3 @@
-<?php
-  $_CoreAuth_Enterprise->requireAuth();
-?>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -14,7 +11,8 @@
 <p>You have been successfully authenticated!</p>
 <p>To logout, please click <button onclick="deAuth()">this button.</button>.</p>
 
-<?php $_CoreAuth_Enterprise->getComponent("ShowUsers"); ?>
+{{ component("ShowUsers") }}
+
 <hr/>
 <?php
 

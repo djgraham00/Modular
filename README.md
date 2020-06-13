@@ -2,7 +2,7 @@
 A simple PHP framework for creating web applications using reusable modules.
 
 ### IMPORTANT
-The overall stucture of web application created using Modular is not fully decided, so for now compatibility of modules between different Modular versions is not garanteed, however we will try our best not to break compatiblity.
+The overall structure of web application created using Modular is not fully decided, so for now compatibility of modules between different Modular versions is not garanteed, however we will try our best not to break compatiblity.
 
 ## Dependencies
 Modular only uses features builtin to PHP 7 and does not depend on any other libraries. It is designed to run on Apache Web Server, but could be modified to run on NGINX or IIS fairly easily (just create the proper rules for URL redirection, using the .htaccess file provided for reference). Modular relies heavily on JSON files for configuration. It is highly recomended to disallow access to files in the src directory using either .htaccess if using Apache, or using your webservers' equavialent.
@@ -21,6 +21,7 @@ Modular is very centric on the idea that related portions of the application be 
     "MOD_HAS_ROUTES"      : true,
     "MOD_ROUTES_VAR"      : "rts",
     "MOD_HAS_MODELS"      : true,
+    "MOD_TEMPLATE_DIR"    : "templates"
     "MOD_MODEL_DIR"       : "models",
     "MOD_COMPONENT_DIR"   : "components",
     "MOD_MODEL_INIT"      : "__initModels"

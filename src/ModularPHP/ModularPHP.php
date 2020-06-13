@@ -260,13 +260,19 @@ class ModularPHP {
             }
         }
         else{
+
+            if(isset($thisRoute["redirect"])) {
+                header("Location: ".$thisRoute["redirect"]);
+                exit;
+            }
+
             if(isset($thisRoute["component"])) {
                 $this->loadComponent($thisRoute);
             } else {
                 if(MPHelper::contains(".twig", $thisRoute["template"])) {
                     $loader = new \Twig\Loader\FilesystemLoader(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["mod"] . "/". $modDir);
                     $twig = new \Twig\Environment($loader, [
-                        'cache' => __dir__.'/ModularPHP/cache',
+                        'cache' => __dir__.'/../cache',
                     ]);
 
                     echo $twig->render($thisRoute["template"], $this->Modules);
@@ -280,12 +286,17 @@ class ModularPHP {
 
     }
 
-    private function loadComponent($thisRoute) {
+    public function loadComponent($thisRoute) {
+
         $name = $thisRoute["component"]."Controller";
-        $moduleName = "_".$thisRoute['mod'];
         $tmp = new $name($this);
-        $tmp->__index($_GET);
-        $tmp->__render();
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $tmp->__POST($_POST);
+        } else if($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $tmp->__GET($_GET);
+        }
+
     }
     /**
      * Tests if a route is passing data to the requested page
@@ -529,5 +540,10 @@ class MPHelper {
     public static function contains($needle, $haystack)
     {
         return strpos($haystack, $needle) !== false;
+    }
+
+    public static function getError($type)
+    {
+        return __DIR__ . "/templates/$type.tpl.php";
     }
 }

@@ -1,68 +1,29 @@
 <?php
 
-class CoreAuth_Enterprise extends MPModule {
+class CoreAuth extends MPModule {
 
     public $rts = array(
         "/" => array(
             "path" => "/",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/auto.routing.php"
+            "redirect" => "./Login"
         ),
-        "/auto" => array(
-            "path" => "/auto",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/auto.routing.php"
+        "/Login" => array(
+            "path" => "/Login",
+            "component" => "Login"
         ),
-        "/login" => array(
-            "path" => "/login",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/index.tpl.php"
+        "/CoreAuthHome" => array(
+            "path" => "/CoreAuthHome",
+            "component" => "CoreAuthHome"
         ),
-        "/createAccount" => array(
-            "path" => "/login",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/index.tpl.php"
-        ),
-        "/_coreAuthAPI_auth" => array(
-            "path" => "/_coreAuthAPI_auth",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/auth.api.php"
-        ),
-        "/_coreAuthAPI_deAuth" => array(
-            "path" => "/_coreAuthAPI_deAuth",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/deauth.api.php"
-        ),
-        "/coreAuthHome" => array(
-            "path" => "/coreAuthHome",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/builtin_home.tpl.php"
-        ),
-        "/passwordResetSelfService" => array(
-            "path" => "/passwordResetSelfService",
-            "accessTo" => array("1"),
-            "template" => "CoreAuth_Enterprise/templates/passwordreset.tpl.php"
-        ),
-        "/users" => array(
-            "path"  => "/users",
-            "component" => "ShowUsers"
-        ),
-        "/TwigTest" => array(
-            "path" => "/TwigTest",
-            "template" => "test.twig"
+        "/Logout" => array(
+            "path" => "/Logout",
+            "component" => "Logout"
         )
     );
 
-
     public $enableLoginRedir = true;
 
-    protected function init()
-    {
-
-    }
-
-    public function getPassword($username)
-    {
+    public function getPassword($username) {
 
        $obj = $this->Parent->getObject(new coreauth_USER(), array("username" => $username));
 
