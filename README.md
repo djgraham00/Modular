@@ -1,5 +1,5 @@
 <img src="https://github.com/djgraham00/djgraham00.github.io/raw/master/modular_logo.png" alt="Modular Logo" width="300"/>
-A easy to use, and simple web application framework for modular development.
+A simple PHP framwork for creating web applications using reusable modules.
 
 ### IMPORTANT
 The overall stucture of web application created using Modular is not fully decided, so for now compatibility of modules between different Modular versions is not garanteed, however we will try our best not to break compatiblity.
