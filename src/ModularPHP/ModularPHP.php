@@ -7,6 +7,10 @@
  */
 
 require ("classes/dbmodel.php");
+require ("classes/MPComponent.php");
+require ("classes/MPModule.php");
+require ("inc/vendor/autoload.php");
+
 $moduleFolder = "";
 
 if(file_exists(__dir__ . "/../application.json")) {
@@ -37,13 +41,13 @@ foreach ($modules as $mod) {
         $moduleInfo = json_decode(file_get_contents("$modDir/$mod/$mod.json"));
 
         //Then, import the main class for that module
-        require("$modDir/$mod/" . $moduleInfo->ImportFileName);
+        require("$modDir/$mod/" . $moduleInfo->MOD_FILE);
 
         //Also, add the module information to the loaded module array
         $mods[$mod] = $moduleInfo;
 
         //Next, require the database modules if any exist for the given module
-        if(isset($moduleInfo->HasDBModels) && $moduleInfo->HasDBModels == true && isset($moduleInfo->MOD_MODEL_DIR)){
+        if(isset($moduleInfo->MOD_HAS_MODELS) && $moduleInfo->MOD_HAS_MODELS == true && isset($moduleInfo->MOD_MODEL_DIR)){
             foreach ((array_diff(scandir("$modDir/$mod/{$moduleInfo->MOD_MODEL_DIR}"), array('.', '..'))) as $dbmodel) {
                 require("$modDir/$mod/{$moduleInfo->MOD_MODEL_DIR}/$dbmodel");
             }
@@ -69,12 +73,17 @@ class ModularPHP {
     private $APP_MODULE_DIR = "";
     public $APP_NAME       = "";
     public $APP_BASE_URL   = "";
+    public $APP_VER = "0.0.1";
 
     //Public Variables
     public $PDO;
+    public $MYSQL;
     public $Modules = array();
     public $loadedModNames = array();
     public $Routes = array();
+
+    public $MP_DIR;
+    public $MOD_DIR;
 
     public function __construct()
     {
@@ -84,8 +93,16 @@ class ModularPHP {
         //Initiate a connection to the database using the provided information
         $this->PDO = new PDO($this->APP_DB_TYPE . ":host=" . $this->APP_DB_HOST . ";dbname=" . $this->APP_DB_NAME, $this->APP_DB_USER, $this->APP_DB_PASS);
 
+        if($this->APP_DB_TYPE == "mysql") {
+            $this->MYSQL = new mysqli($this->APP_DB_HOST, $this->APP_DB_USER, $this->APP_DB_PASS, $this->APP_DB_NAME);
+        }
         //Load all of the modules
         $this->loadModules();
+
+        $this->MP_DIR = __DIR__; //dirname(__FILE__);
+        $this->MOD_DIR = $this->MP_DIR . "/../" . $this->APP_MODULE_DIR;
+
+        $this->Modules = array_merge($this->Modules, array("_ModularPHP" => $this));
 
     }
 
@@ -108,19 +125,57 @@ class ModularPHP {
 
         foreach ($mods as $modName=>$modInfo) {
 
-            $mainClass = $modInfo->MainClass;
+            $mainClass = $modInfo->MOD_CLASS;
 
-            ${$modName} = new $mainClass($this, $modInfo);
-
-            if ($modInfo->HasRouteDefinitions) {
-                $routeDefinitionVar = $modInfo->RouteDefinitionVar;
-                $this->Routes = array_merge($this->Routes, ${$modName}->{$routeDefinitionVar});
+            if (isset($modInfo->MOD_DEPENDENCIES)) {
+                foreach ($modInfo->MOD_DEPENDENCIES as $depMod) {
+                    $this->loadModule($depMod);
+                }
             }
 
-            /* if(isset($modInfo->HasDBModels) && $modInfo->HasDBModels == true){
-                $funcName = $modInfo->ModelsInitMethod;
+            $this->loadModule($modName);
+        }
+    }
+
+    private function loadModule($modName) {
+
+        global $mods;
+
+        if(!in_array($modName, $this->loadedModNames)) {
+
+            $modInfo = $mods[$modName];
+
+            $mainClass = $modInfo->MOD_CLASS;
+
+            if (isset($modInfo->MOD_DEPENDENCIES)) {
+                foreach ($modInfo->MOD_DEPENDENCIES as $depMod) {
+                    $this->loadModule($depMod);
+                }
+            }
+
+            if (isset($modInfo->IsLibrary) && $modInfo->IsLibrary == true) {
+                ${$modName} = new $mainClass();
+            } else {
+                ${$modName} = new $mainClass($this, $modInfo);
+            }
+
+
+            if ($modInfo->MOD_HAS_ROUTES) {
+                $routeDefinitionVar = $modInfo->MOD_ROUTES_VAR;
+
+                $routes = ${$modName}->{$routeDefinitionVar};
+
+                foreach ($routes as $rt=>$inf) {
+                    $routes[$rt]["mod"] = $modName;
+                }
+
+                $this->Routes = array_merge($this->Routes, $routes);
+            }
+
+            if (isset($modInfo->MOD_HAS_MODELS) && $modInfo->MOD_HAS_MODELS == true) {
+                $funcName = $modInfo->MOD_MODEL_INIT;
                 ${$modName}->$funcName();
-            } */
+            }
 
             $this->Modules = array_merge($this->Modules, array("_$mainClass" => ${$modName}));
             array_push($this->loadedModNames, $modName);
@@ -160,6 +215,9 @@ class ModularPHP {
             $rt = array("", "/");
             $thisRoute = $this->Routes["/"];
         }
+
+        $modDir = $this->Modules["_".$thisRoute["mod"]]->Config->MOD_TEMPLATE_DIR;
+
         if ($this->isRouteDynamic($rt[1])) {
 
             if (count($rt) > 1) {
@@ -183,15 +241,63 @@ class ModularPHP {
                     @${$varName} = $vars[$i];
                 }
 
-                include(__dir__ . "/../". $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+
+                if(isset($thisRoute["component"])) {
+                    $this->loadComponent($thisRoute);
+                } else {
+                    if(MPHelper::contains(".twig", $thisRoute["template"])) {
+                        $loader = new \Twig\Loader\FilesystemLoader(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["mod"] . "/" . $modDir);
+                        $twig = new \Twig\Environment($loader, [
+                            'cache' => __dir__.'/ModularPHP/cache',
+                        ]);
+
+                        echo $twig->render('index.html', $this->Modules);
+
+                    } else {
+                        include(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+                    }
+                }
             }
         }
         else{
-            include(__dir__ . "/../". $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+
+            if(isset($thisRoute["redirect"])) {
+                header("Location: ".$thisRoute["redirect"]);
+                exit;
+            }
+
+            if(isset($thisRoute["component"])) {
+                $this->loadComponent($thisRoute);
+            } else {
+                if(MPHelper::contains(".twig", $thisRoute["template"])) {
+                    $loader = new \Twig\Loader\FilesystemLoader(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["mod"] . "/". $modDir);
+                    $twig = new \Twig\Environment($loader, [
+                        'cache' => __dir__.'/../cache',
+                    ]);
+
+                    echo $twig->render($thisRoute["template"], $this->Modules);
+
+                } else {
+                    include(__dir__ . "/../" . $this->APP_MODULE_DIR . "/" . $thisRoute["template"]);
+                }
+
+            }
         }
 
     }
 
+    public function loadComponent($thisRoute) {
+
+        $name = $thisRoute["component"]."Controller";
+        $tmp = new $name($this);
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $tmp->__POST($_POST);
+        } else if($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $tmp->__GET($_GET);
+        }
+
+    }
     /**
      * Tests if a route is passing data to the requested page
      * @param string $rt
@@ -253,41 +359,53 @@ class ModularPHP {
         }
     }
 
-    public function getInstance($refObj, $key, $value, $customSQL = false, $orderByID = "ASC", $limit = false){
+    public function getObject($ref, $where = array(), $opts = array()){
 
-        if(!$this->tableExists($refObj->tableName)){
-            $objName = get_class($refObj);
+        $whereSQL = "";
+        $isFirst = true;
+
+        foreach ($where as $key=>$val) {
+            if($isFirst) {
+                $whereSQL .= " WHERE $key='$val'";
+                $isFirst = false;
+            }
+            $whereSQL .= " AND $key='$val'";
+        }
+
+        $optsSQL = "";
+
+        foreach ($opts as $opt) {
+            $optsSQL .= "$opt ";
+        }
+
+        if(!$this->tableExists($ref->tableName)){
+            $objName = get_class($ref);
             $this->createTable(new $objName());
-            $this->getInstance($refObj, $key, $value);
+            $this->getObject($ref, $where, $opts);
         }
 
         try{
 
-            $sql = "SELECT * FROM ".$refObj->tableName. " WHERE $key='$value' ORDER BY id $orderByID";
-
-            if($limit != false) {
-                $sql .= " LIMIT $limit";
-            }
-
-            if($customSQL != false){
-                $sql = $customSQL;
-            }
+            $sql = "SELECT * FROM ".$ref->tableName." {$whereSQL} {$optsSQL} LIMIT 1";
 
             $getObjs = $this->PDO->prepare($sql);
             $getObjs->execute();
 
             $objs = $getObjs->fetchAll();
 
+            $class = get_class($ref);
+            $tmp = new $class();
+
             if($objs != FALSE) {
                 foreach ($objs[0] as $key => $value) {
-                    $refObj->{$key} = $value;
+                    $tmp->{$key} = $value;
                 }
             }
             else{
                 return false;
             }
 
-            return $refObj;
+            return $tmp;
 
         }
         catch (PDOException $e){
@@ -295,16 +413,38 @@ class ModularPHP {
         }
     }
 
-    public function getAllObjects($refObj){
+    public function getObjects($ref, $where = array(), $opts = array()) {
 
-        if(!$this->tableExists($refObj->tableName)){
-            $objName = get_class($refObj);
+        $whereSQL = "";
+        $isFirst = false;
+
+        $whereSQL = "";
+        $isFirst = true;
+
+        foreach ($where as $key=>$val) {
+            if($isFirst) {
+                $whereSQL .= " WHERE $key='$val'";
+                $isFirst = false;
+            }
+            $whereSQL .= " AND $key='$val'";
+        }
+
+        $optsSQL = "";
+
+        foreach ($opts as $opt) {
+            $optsSQL .= "$opt ";
+        }
+
+
+        if(!$this->tableExists($ref->tableName)){
+            $objName = get_class($ref);
             $this->createTable(new $objName());
-            $this->getAllObjects($refObj);
+            $this->getObject($ref, $where, $opts);
         }
 
         try{
-            $sql = "SELECT * FROM ".$refObj->tableName;
+
+            $sql = "SELECT * FROM ".$ref->tableName."{$whereSQL} {$optsSQL}";
             $getObjs = $this->PDO->prepare($sql);
             $getObjs->execute();
 
@@ -313,7 +453,7 @@ class ModularPHP {
             $objs = $getObjs->fetchAll();
 
             foreach($objs as $obj) {
-                $class = get_class($refObj);
+                $class = get_class($ref);
                 $tmpObj = new $class();
                 foreach($obj as $key=>$value){
                     $tmpObj->{$key} = $value;
@@ -327,8 +467,26 @@ class ModularPHP {
         catch (PDOException $e){
             echo $e->getMessage();
         }
-
     }
+
+    /* Backwards-compatibility functions */
+    public function getAllObjects($refObj) {
+        return $this->getObject($refObj, array(), array());
+    }
+
+    public function getInstance($refObj, $key, $value, $customSQL = false, $orderByID = "ASC", $limit = false)
+    {
+
+        $opts = array();
+        array_push($opts, "ORDER BY id {$orderByID}");
+
+        if ($limit) {
+            array_push($opts, "LIMIT $limit");
+        }
+
+        return $this->getObject($refObj, array($key => $value), $opts);
+    }
+
 
     public function tableExists($table) {
         // Try a select statement against the table
@@ -375,4 +533,17 @@ class ModularPHP {
 
     }
 
+}
+
+class MPHelper {
+    // returns true if $needle is a substring of $haystack
+    public static function contains($needle, $haystack)
+    {
+        return strpos($haystack, $needle) !== false;
+    }
+
+    public static function getError($type)
+    {
+        return __DIR__ . "/templates/$type.tpl.php";
+    }
 }

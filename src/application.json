@@ -1,10 +1,11 @@
 {
-  "APP_NAME"        : "<YOUR_APP_NAME>",
+  "APP_NAME"        : "ModularPHP Test Application",
+  "APP_ORG"         : "NA",
   "APP_MODULE_DIR"  : "modules",
-  "APP_BASE_URL"    : "<YOUR_BASE_URL>",
+  "APP_BASE_URL"    : "http://localhost/Modular-dev/Modular/",
   "APP_DB_TYPE"     : "mysql",
   "APP_DB_HOST"     : "localhost",
-  "APP_DB_NAME"     : "<YOUR_DB_NAME>",
-  "APP_DB_USER"     : "<YOUR_DB_USERNAME>",
-  "APP_DB_PASS"     : "<YOUR_DB_PASSWORD>"
+  "APP_DB_NAME"     : "mpdev",
+  "APP_DB_USER"     : "root",
+  "APP_DB_PASS"     : ""
 }

@@ -1,10 +1,10 @@
 function deAuth(){
     $.ajax({
-          url: './_coreAuthAPI_deAuth',
+          url: './Logout',
           type: 'POST',
           success: function (data) {
               if(data.success === true){
-                 window.location.replace ("./login");
+                 window.location.replace ("./Login");
               }
           },
           error: function (request, error) {
@@ -16,7 +16,7 @@ function deAuth(){
   function login(redirectLocation) {
       console.log(redirectLocation);
     $.ajax({
-        url: './_coreAuthAPI_auth',
+        url: './Login',
         type: 'POST',
         data: {
             'username': $('[name=username]').val(),
@@ -28,7 +28,7 @@ function deAuth(){
             if(data.success === true){
                window.location.replace (redirectLocation);
             }else{
-                document.getElementById("err").innerHTML = "Invalid Username or Password";
+                addAlert("danger", "Invalid Username or Password...");
             }
         },
         error: function (request, error) {
