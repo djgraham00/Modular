@@ -1,12 +1,12 @@
 <?php
 /**
- * ModularPHP
+ * Modular
  * Created by Drew Graham (https://drewjgraham.com)
  * Creation Date: 10/2/2019
- * Updated : 1/4/2020
+ * Updated : 6/13/2020
  */
 
-require ("classes/dbmodel.php");
+require ("classes/MPModel.php");
 require ("classes/MPComponent.php");
 require ("classes/MPModule.php");
 require ("inc/vendor/autoload.php");
@@ -533,6 +533,9 @@ class ModularPHP {
 
     }
 
+    public static function GetModule($ref, $mod) {
+        return $ref->Modules["_".$mod];
+    }
 }
 
 class MPHelper {

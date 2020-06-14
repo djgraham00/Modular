@@ -11,6 +11,10 @@ class CoreAuth extends MPModule {
             "path" => "/Login",
             "component" => "Login"
         ),
+        "/Register" => array(
+            "path" => "/Register",
+            "component" => "CreateAccount"
+        ),
         "/CoreAuthHome" => array(
             "path" => "/CoreAuthHome",
             "component" => "CoreAuthHome"

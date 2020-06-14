@@ -8,6 +8,11 @@ class MPComponent {
     public function __construct($p)
     {
         $this->ModularPHP = $p;
+
+        foreach ($p->Modules as $m=>$ref) {
+            $this->{$m} = $ref;
+        }
+
     }
 
     public function __GET($params) {
@@ -21,6 +26,8 @@ class MPComponent {
     private function showComponent($cmp) {
 
     }
+
+
     public function __render() {
         foreach ($this->getFields() as $val) {
             ${$val} = $this->{$val};
@@ -29,6 +36,7 @@ class MPComponent {
         $reflection = new ReflectionClass($this);
 
         if(MPHelper::contains(".twig", $this->template)) {
+
             $loader = new \Twig\Loader\FilesystemLoader(dirname($reflection->getFileName()) );
             $twig = new \Twig\Environment($loader, [
                 'cache' => __dir__.'/../cache',
@@ -38,6 +46,7 @@ class MPComponent {
             $function = new \Twig\TwigFunction('component', function ($name) {
                 $this->ModularPHP->loadComponent(array("component" => $name));
             });
+
             $twig->addFunction($function);
 
             //getComponent($name)

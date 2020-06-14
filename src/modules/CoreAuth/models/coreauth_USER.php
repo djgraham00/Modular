@@ -1,6 +1,6 @@
 <?php
 
-class coreauth_USER extends dbmodel {
+class coreauth_USER extends MPModel {
 
     public $tableName    = "coreauth_users";
     public $firstName    = "varchar(255) NOT NULL";

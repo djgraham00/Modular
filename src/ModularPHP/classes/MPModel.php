@@ -2,7 +2,7 @@
 
 require ("MPDatabaseHandler.php");
 
-class dbmodel {
+class MPModel {
 
     public $tableName = "";
     public $id = "int(11) NOT NULL";
@@ -49,7 +49,7 @@ class dbmodel {
         $count = 1;
         foreach ($fields as $f) {
             if($f == "id") {
-                if($this->{$f} !=  "int(11) NOT NULL") {
+                if(!MPHelper::contains("int", $this->{$f})) {
                     $fieldsStr .= ",$f";
                     if ($count < count($fields) - 1) {
                         $fieldsStr .= ",";
@@ -75,7 +75,7 @@ class dbmodel {
         $count = 1;
         foreach ($this as $f => $v) {
             if($f == "id") {
-                if($v != "int(11) NOT NULL") {
+                if(!MPHelper::contains("int", $v)) {
                     $fieldsStr .= ",'$v'";
                     if ($count < count($this->getFields())) {
                         $fieldsStr .= ",";
@@ -96,13 +96,13 @@ class dbmodel {
     }
 
     public function save() {
-        $return = false;
+        $return = true;
 
-        if ($this->id != "int(11) NOT NULL") {
-            $return = MPDatabaseHandler::deleteObject($this);
-            $return = $return & MPDatabaseHandler::insertObject($this);
+        if (!MPHelper::contains("int", $this->id)) {
+            $return .= MPDatabaseHandler::deleteObject($this);
+            $return .= MPDatabaseHandler::insertObject($this);
         } else {
-            $return = $return & MPDatabaseHandler::insertObject($this);
+            $return .= $return & MPDatabaseHandler::insertObject($this);
         }
 
         return $return;
@@ -124,7 +124,9 @@ class dbmodel {
     }
 
     public static function GetWhere($where) {
-
+        $class = static::class;
+        $obj = new $class();
+        return MPDatabaseHandler::getObject($obj, $where);
     }
 
     public static function GetAllWhere($where) {

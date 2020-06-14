@@ -8,6 +8,6 @@
     "MOD_COMPONENT_DIR"   : "components",
     "MOD_TEMPLATE_DIR"    : "templates",
     "MOD_MODEL_INIT"      : "__initModels",
-    "LoginRdir"           : "./CoreAuthHome",
-    "APP_HOME_URL"        : "./CoreAuthHome"
+    "LoginRdir"           : "./APHOME",
+    "APP_HOME_URL"        : "./APHOME"
 }

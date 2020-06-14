@@ -5,7 +5,7 @@ class LoginController extends MPComponent {
     {
         $this->template = "login.twig";
 
-        $this->ModularPHP->Modules["_CoreAuth"]->loginRedir();
+        $this->_CoreAuth->loginRedir();
 
         $this->__render();
     }
@@ -14,7 +14,7 @@ class LoginController extends MPComponent {
     {
         header("Content-Type: application/json");
 
-        if($this->ModularPHP->Modules['_CoreAuth']->auth($params['username'], $params['password'])){
+        if($this->_CoreAuth->auth($params['username'], $params['password'])){
             echo '{ "success" : true }';
         }
         else {
