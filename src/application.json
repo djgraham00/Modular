@@ -1,9 +1,10 @@
 {
+  "APP_NAME"        : "New App",
   "APP_MODULE_DIR"  : "Modules",
-  "APP_ENTRY_POINT" : "test.drewisgreat",
+  "APP_ENTRY_POINT" : "test.Index",
   "APP_DB_TYPE"     : "mysql",
   "APP_DB_HOST"     : "localhost",
-  "APP_DB_NAME"     : "bpdev",
+  "APP_DB_NAME"     : "m3",
   "APP_DB_USER"     : "root",
   "APP_DB_PASS"     : ""
 }

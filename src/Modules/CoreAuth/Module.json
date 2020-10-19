@@ -1,0 +1,6 @@
+{
+  "MOD_PACKAGE" : "CoreAuth",
+  "MOD_DEPENDENCIES" : [],
+  "MOD_HAS_MODELS" : true,
+  "MOD_MODEL_AUTOINIT" : true
+}

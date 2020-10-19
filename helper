@@ -1,0 +1,63 @@
+<?php
+
+if ($argv[1] == "createmod") {
+
+    if(!isset($argv[2])) {
+        echo "Error: Must specify new module name";
+        exit;
+    } else {
+        $mod = $argv[2];
+    }
+
+    if(is_dir("src/Modules/{$mod}")) {
+        echo "Error: Module exists";
+        exit;
+    } else {
+        $modPath = "src/Modules/{$mod}";
+        if(mkdir($modPath)){
+
+            mkdir("{$modPath}/Components");
+            mkdir("{$modPath}/Models");
+
+            $config = fopen("{$modPath}/Module.json", "w") or die("Error: Unable to create module configuration...");
+
+            $txt = "{ \"MOD_PACKAGE\" : \"{$mod}\", \"MOD_DEPENDENCIES\" : [], \"MOD_HAS_MODELS\" : true, \"MOD_MODEL_AUTOINIT\" : false }";
+
+            if(fwrite($config, $txt)){
+                fclose($config);
+                echo "Module successfully created!";
+                exit;
+            }
+        }
+    }
+} else if ($argv[1] == "createcmp") {
+ if(!isset($argv[2])) {
+        echo "Error: Must specify new module name";
+        exit;
+    } else {
+        $mod = $argv[2];
+    }
+
+    if(is_dir("src/Modules/{$mod}")) {
+        echo "Error: Module exists";
+        exit;
+    } else {
+        $modPath = "src/Modules/{$mod}";
+        if(mkdir($modPath)){
+
+            mkdir("{$modPath}/Components");
+
+            $config = fopen("{$modPath}/Module.json", "w") or die("Error: Unable to create module configuration...");
+
+
+            if(fwrite($config, $txt)){
+                fclose($config);
+                echo "Module successfully created!";
+                exit;
+            }
+        }
+    }
+
+
+
+}

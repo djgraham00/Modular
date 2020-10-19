@@ -4,7 +4,7 @@ namespace Modular;
 
 class Component {
 
-    private $Modular;
+    public $Modular;
 
     public $template = NULL;
     public $denyAccess = false;

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>{{ ModularP.APP_NAME }}</title>
+    <base href="{{ Modular.APP_BASE_URL }}" target="_blank">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <script type="text/javascript" src="static/js/jquery.js"></script>
+    <script type="text/javascript" src="static/js/common.js"></script>
+    <script type="text/javascript" src="static/js/coreauth.js"></script>
+
+    <script src="static/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/css/bootstrap-login.css">
+</head>
+<body class="text-center">
+
+<form class="form-signin" style="text-align: left;" onsubmit="createAccount(); return false;">
+    <!-- <h1 class="h3 mb-3 font-weight-normal">Welcome to Perkins-Tryon Public Schools</h1> -->
+    <span style="text-align: left;" id="errView"></span>
+
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label>First name</label>
+                <input type="text" class="form-control" name="firstName" placeholder="First name">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Last name</label>
+                <input type="text" class="form-control" name="lastName" placeholder="Last name">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" class="form-control" name="username" placeholder="Username">
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" class="form-control" name="password_confirm" placeholder="Confirm Password">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <a target="_self" href="./Login" class="form-control btn btn-lg btn-danger btn-block">Back</a>
+        </div>
+        <div class="col">
+            <button class="form-control btn btn-lg btn-primary btn-block" type="submit">Create Account</button>
+        </div>
+    </div>
+
+    <p class="mt-5 mb-3 text-muted text-center">{Powered CoreAuth}</p>
+
+</form>
+
+</body>
+</html>

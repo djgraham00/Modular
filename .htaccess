@@ -7,3 +7,8 @@ RewriteRule ^(.+)$ index.php?rt=$1 [QSA]
     Order Deny,Allow
     Deny from all
 </Files>
+
+<Files "helper">
+    Order Deny,Allow
+    Deny from all
+</Files>

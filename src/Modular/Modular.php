@@ -47,13 +47,21 @@ foreach ($modules as $mod) {
         $cmps = array_diff(scandir($cmpDir), array('.', '..'));
 
         foreach ($cmps as $cmp) {
-            require ("{$cmpDir}/{$cmp}/Controller.php");
+            require ("{$cmpDir}/{$cmp}/{$cmp}.php");
         }
 
         //Next, require the database modules if any exist for the given module
         if(isset($moduleInfo->MOD_HAS_MODELS) && $moduleInfo->MOD_HAS_MODELS == true){
             foreach ((array_diff(scandir("$modDir/$mod/Models"), array('.', '..'))) as $dbmodel) {
                 require("$modDir/$mod/Models/$dbmodel");
+
+                if($moduleInfo->MOD_MODEL_AUTOINIT) {
+                    $class = chop($dbmodel, ".php");
+                    $class = "$mod\\$class";
+                    $tmp = new $class();
+                    DBHelper::createTable($tmp);
+                }
+
             }
         }
 
