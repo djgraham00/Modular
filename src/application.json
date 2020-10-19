@@ -1,11 +1,9 @@
 {
-  "APP_NAME"        : "ModularPHP Test Application",
-  "APP_ORG"         : "NA",
-  "APP_MODULE_DIR"  : "modules",
-  "APP_BASE_URL"    : "http://localhost/Modular-dev/Modular/",
+  "APP_MODULE_DIR"  : "Modules",
+  "APP_ENTRY_POINT" : "test.drewisgreat",
   "APP_DB_TYPE"     : "mysql",
   "APP_DB_HOST"     : "localhost",
-  "APP_DB_NAME"     : "mpdev",
+  "APP_DB_NAME"     : "bpdev",
   "APP_DB_USER"     : "root",
   "APP_DB_PASS"     : ""
 }
